@@ -18,7 +18,7 @@ import { matchCandidatesWithGemma, calculateKeywordMatches, db, APP_NAME, reques
 import { formatWhatsAppUrl, generateQrCodeDataUrl } from '../utils';
 import { MatchOverlapAvatars } from './MatchOverlapAvatars';
 import { useDialogA11y } from '../hooks/useDialogA11y';
-import { BRAND_NAME, PRIMARY_URL } from '../lib/brand';
+import { BRAND_NAME, profileShareUrl } from '../lib/brand';
 
 interface MatchesViewProps {
   currentProfile: Profile;
@@ -51,7 +51,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
   const [copiedInvite, setCopiedInvite] = useState(false);
   const inviteDialogRef = useDialogA11y<HTMLDivElement>(showInviteModal, () => setShowInviteModal(false));
 
-  const inviteUrl = `${PRIMARY_URL}/#/u/${currentProfile.id}`;
+  const inviteUrl = profileShareUrl(currentProfile.id);
 
   useEffect(() => {
     generateQrCodeDataUrl(inviteUrl, 200).then(setInviteQrDataUrl).catch(() => {});

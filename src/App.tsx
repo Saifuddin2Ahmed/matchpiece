@@ -28,6 +28,7 @@ import {
 import { auth, handleRedirectResult, logOut } from './services/firebase';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BRAND_NAME } from './lib/brand';
+import { parseAppRoute } from './lib/route';
 
 const AdminView = React.lazy(() => import('./components/AdminView').then(m => ({ default: m.AdminView })));
 const WallView = React.lazy(() => import('./components/WallView').then(m => ({ default: m.WallView })));
@@ -271,13 +272,8 @@ export default function App() {
 
   // Handle URL hash changes (and pathname direct links like /privacy, /license)
   const handleHashChange = useCallback(() => {
-    const rawHash = window.location.hash.replace(/^#\/?/, '');
-    const rawPath = window.location.pathname.replace(/^\//, '');
-    const directPath = ['privacy', 'license', 'about', 'wall'].includes(rawPath) ? rawPath : '';
-    const effective = rawHash || directPath || 'home';
-    const parts = effective.split('/');
-    const main = parts[0] || 'home';
-    const sub = parts[1];
+    const { main, sub, replaceWith } = parseAppRoute(window.location.hash, window.location.pathname);
+    if (replaceWith) window.history.replaceState(null, '', replaceWith);
 
     if (main === 'wall') {
       setActiveTab('wall');

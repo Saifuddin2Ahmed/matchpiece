@@ -49,7 +49,7 @@ import { SocialLinksRow } from './SocialLinksRow';
 import { getSortedCountries, deriveLocation } from '../lib/countries';
 import { ROLE_CHOICES, STAGE_CHOICES, INTENT_CHOICES, parseIntents, toggleChoice, makeFirst } from '../lib/profileChoices';
 import { auth, addPasswordToAccount, validatePasswordStrength, formatAuthError } from '../services/firebase';
-import { BRAND_NAME, BRAND_SLUG, PRIMARY_URL } from '../lib/brand';
+import { BRAND_NAME, BRAND_SLUG, profileShareUrl } from '../lib/brand';
 
 const ShareCardModal = React.lazy(() => import('./ShareCardModal').then(m => ({ default: m.ShareCardModal })));
 
@@ -273,7 +273,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const userEmail = currentUser?.email || profile.email || 'your account';
 
   useEffect(() => {
-    const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
+    const profileUrl = profileShareUrl(profile.id);
     generateQrCodeDataUrl(profileUrl, 240).then(setQrCodeDataUrl);
   }, [profile.id]);
 
@@ -526,7 +526,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   };
 
   const handleShareLink = () => {
-    const url = `${PRIMARY_URL}/#/u/${profile.id}`;
+    const url = profileShareUrl(profile.id);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       onToast('Profile link copied to clipboard');

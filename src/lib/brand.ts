@@ -26,6 +26,11 @@ export const COPYRIGHT_LINE = `© 2026 ${BRAND_NAME} · formerly ${BRAND_FORMERL
 /** Copyright holder in LICENSE. */
 export const LICENSE_HOLDER = `The ${BRAND_NAME} Team (formerly ${BRAND_FORMERLY})`;
 
+/** Share link for a profile. /u/<id> (not /#/u/<id>) so link previews can show the profile. */
+export function profileShareUrl(id: string): string {
+  return `${PRIMARY_URL}/u/${encodeURIComponent(id)}`;
+}
+
 /** Lowercase slug for downloaded file names. */
 export const BRAND_SLUG = BRAND_NAME.toLowerCase();
 

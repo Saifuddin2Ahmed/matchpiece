@@ -18,7 +18,7 @@ import { Avatar } from './Avatar';
 import { PageHeader } from './PageHeader';
 import { HEADER_IMAGES } from '../lib/headerImages';
 import { askKwegatta } from '../services/api';
-import { BRAND_NAME, PRIMARY_URL } from '../lib/brand';
+import { BRAND_NAME, profileShareUrl } from '../lib/brand';
 
 interface PeopleViewProps {
   currentProfile: Profile | null;
@@ -546,7 +546,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
               <>
                 <button
                   onClick={() => {
-                    const inviteUrl = `${PRIMARY_URL}/#/u/${currentProfile.id}`;
+                    const inviteUrl = profileShareUrl(currentProfile.id);
                     if (navigator.clipboard) {
                       navigator.clipboard.writeText(inviteUrl);
                     }

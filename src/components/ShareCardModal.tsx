@@ -3,7 +3,7 @@ import { X, Download, Share2, Sparkles } from 'lucide-react';
 import { Profile } from '../types';
 import { generateQrCodeDataUrl } from '../utils';
 import { useDialogA11y } from '../hooks/useDialogA11y';
-import { BRAND_NAME, BRAND_SLUG, PRIMARY_HOST, PRIMARY_URL } from '../lib/brand';
+import { BRAND_NAME, BRAND_SLUG, PRIMARY_HOST, profileShareUrl } from '../lib/brand';
 
 interface ShareCardModalProps {
   profile: Profile;
@@ -87,7 +87,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
       const qrX = width - qrSize - 64;
       const qrY = height - qrSize - 64;
 
-      const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
+      const profileUrl = profileShareUrl(profile.id);
       const qrData = await generateQrCodeDataUrl(profileUrl, 240);
 
       let qrImg: HTMLImageElement | null = null;
@@ -328,7 +328,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
   };
 
   const handleShare = async () => {
-    const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
+    const profileUrl = profileShareUrl(profile.id);
     if (navigator.share) {
       try {
         await navigator.share({

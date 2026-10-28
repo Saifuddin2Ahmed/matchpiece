@@ -19,6 +19,7 @@ import { validateEventTitle } from './src/lib/eventTitle';
 import { validateTeamPayload, checkPhotoDataUrl, checkX, checkWebsite, whatsappLink, TEAM_VISIBILITY_FLAGS } from './src/lib/teamFields';
 import { getEffectiveStartMs, getEffectiveEndMs, getOpportunityDeadlineMs, sortForTab, findRecentDuplicate } from './src/lib/eventTiming';
 import { withHttps } from './src/lib/links';
+import { markGroup } from './src/lib/brandMark';
 import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_FORMERLY, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -4918,18 +4919,21 @@ export function getPublicAppUrl(): string {
   return raw.replace(/\/+$/, '');
 }
 
-export function injectEventOgIntoHtml(baseHtml: string, item: any): string {
-  const appBase = getPublicAppUrl();
-  const safeId = encodeURIComponent(String(item.id || ''));
-  const rawTitle = stripControlChars(item.title || 'Event');
-  const escapedTitle = escapeHtml(rawTitle);
-  const rawDesc = buildEventMetaDescription(item);
-  const escapedDesc = escapeHtml(rawDesc);
-  const vHash = computeEventOgVersionHash(item);
-  const canonicalUrl = `${appBase}/e/${safeId}`;
-  const ogImageUrl = `${appBase}/og/event/${safeId}.jpg?v=${vHash}`;
+export interface OgMeta {
+  docTitle: string;
+  title: string;
+  description: string;
+  url: string;
+  image: string;
+  imageAlt: string;
+  type: 'website' | 'profile';
+  /** Path prefix served by this page (e.g. '/e/') and the in-app hash route it should become. */
+  pathPrefix: string;
+  hashRoute: string;
+}
 
-  // Remove existing generic title, description, og:*, twitter:*, and canonical tags so we never duplicate them
+/** Replaces the generic title, description, og:*, twitter:* and canonical tags with page-specific ones. */
+export function injectOgIntoHtml(baseHtml: string, m: OgMeta): string {
   let cleaned = baseHtml
     .replace(/<title>[\s\S]*?<\/title>\s*/gi, '')
     .replace(/<meta\s+name=["']description["'][^>]*>\s*/gi, '')
@@ -4937,25 +4941,26 @@ export function injectEventOgIntoHtml(baseHtml: string, item: any): string {
     .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, '')
     .replace(/<link\s+rel=["']canonical["'][^>]*>\s*/gi, '');
 
+  const e = escapeHtml;
   const injectedBlock = [
-    `<title>${escapedTitle} · ${BRAND_NAME}</title>`,
-    `    <meta name="description" content="${escapedDesc}" />`,
-    `    <meta property="og:type" content="website" />`,
-    `    <meta property="og:site_name" content="${BRAND_NAME}" />`,
-    `    <meta property="og:title" content="${escapedTitle}" />`,
-    `    <meta property="og:description" content="${escapedDesc}" />`,
-    `    <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />`,
-    `    <meta property="og:image" content="${escapeHtml(ogImageUrl)}" />`,
+    `<title>${e(m.docTitle)}</title>`,
+    `    <meta name="description" content="${e(m.description)}" />`,
+    `    <meta property="og:type" content="${m.type}" />`,
+    `    <meta property="og:site_name" content="${e(BRAND_NAME)}" />`,
+    `    <meta property="og:title" content="${e(m.title)}" />`,
+    `    <meta property="og:description" content="${e(m.description)}" />`,
+    `    <meta property="og:url" content="${e(m.url)}" />`,
+    `    <meta property="og:image" content="${e(m.image)}" />`,
     `    <meta property="og:image:width" content="1200" />`,
     `    <meta property="og:image:height" content="630" />`,
     `    <meta property="og:image:type" content="image/jpeg" />`,
-    `    <meta property="og:image:alt" content="${escapedTitle}" />`,
+    `    <meta property="og:image:alt" content="${e(m.imageAlt)}" />`,
     `    <meta name="twitter:card" content="summary_large_image" />`,
-    `    <meta name="twitter:title" content="${escapedTitle}" />`,
-    `    <meta name="twitter:description" content="${escapedDesc}" />`,
-    `    <meta name="twitter:image" content="${escapeHtml(ogImageUrl)}" />`,
-    `    <link rel="canonical" href="${escapeHtml(canonicalUrl)}" />`,
-    `    <script>(function(){try{if(window.location.pathname.indexOf('/e/')===0){window.history.replaceState(null,'','/#/events/${safeId.replace(/'/g, '%27')}');}}catch(_){}})();</script>`
+    `    <meta name="twitter:title" content="${e(m.title)}" />`,
+    `    <meta name="twitter:description" content="${e(m.description)}" />`,
+    `    <meta name="twitter:image" content="${e(m.image)}" />`,
+    `    <link rel="canonical" href="${e(m.url)}" />`,
+    `    <script>(function(){try{if(window.location.pathname.indexOf('${m.pathPrefix}')===0){window.history.replaceState(null,'','${m.hashRoute.replace(/'/g, '%27')}');}}catch(_){}})();</script>`
   ].join('\n');
 
   if (cleaned.includes('</head>')) {
@@ -4963,6 +4968,24 @@ export function injectEventOgIntoHtml(baseHtml: string, item: any): string {
     return cleaned.replace('</head>', () => `    ${injectedBlock}\n  </head>`);
   }
   return `${injectedBlock}\n${cleaned}`;
+}
+
+export function injectEventOgIntoHtml(baseHtml: string, item: any): string {
+  const appBase = getPublicAppUrl();
+  const safeId = encodeURIComponent(String(item.id || ''));
+  const rawTitle = stripControlChars(item.title || 'Event');
+  const vHash = computeEventOgVersionHash(item);
+  return injectOgIntoHtml(baseHtml, {
+    docTitle: `${rawTitle} · ${BRAND_NAME}`,
+    title: rawTitle,
+    description: buildEventMetaDescription(item),
+    url: `${appBase}/e/${safeId}`,
+    image: `${appBase}/og/event/${safeId}.jpg?v=${vHash}`,
+    imageAlt: rawTitle,
+    type: 'website',
+    pathPrefix: '/e/',
+    hashRoute: `/#/events/${safeId}`
+  });
 }
 
 app.get('/e/:id', (req: Request, res: Response) => {
@@ -5072,6 +5095,30 @@ export function buildDefaultOgSvg(): string {
     <rect x="660" y="420" width="220" height="42" rx="21" fill="#12B5A6" fill-opacity="0.12" stroke="#12B5A6" stroke-width="1.5"/>
     <text x="770" y="447" text-anchor="middle" fill="#12B5A6" font-family="Inter, sans-serif" font-size="16" font-weight="700">${escapeHtml(PRIMARY_HOST)}</text>
   </svg>`;
+}
+
+/** Dark background, soft gold glow and thin gold border shared by all share images. */
+export function ogBackgroundSvg(): string {
+  return `<defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#070B12"/>
+        <stop offset="60%" stop-color="#0E1525"/>
+        <stop offset="100%" stop-color="#1A160B"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0.8" cy="0.15" r="0.5">
+        <stop offset="0%" stop-color="#F5B700" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#F5B700" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <rect width="1200" height="630" fill="url(#glow)"/>
+    <rect x="24" y="24" width="1152" height="582" rx="20" fill="none" stroke="#F5B700" stroke-opacity="0.3" stroke-width="2"/>`;
+}
+
+/** Small mark and MATCHPIECE wordmark, top-left of a share image (x, y = top-left of the mark). */
+export function ogHeaderSvg(x: number, y: number): string {
+  return `${markGroup(x, y, 64)}
+    <text x="${x + 78}" y="${y + 44}" fill="#F5B700" font-family="Inter, sans-serif" font-size="32" font-weight="800" letter-spacing="3">${escapeHtml(BRAND_NAME.toUpperCase())}</text>`;
 }
 
 /** Brand badge on event OG images: about 15px per letter at 18px bold with letter spacing. */
@@ -5217,6 +5264,256 @@ app.get('/og/event/:id.jpg', async (req: Request, res: Response) => {
     console.warn('[OG Image] Failed to render event OG image:', err?.message || err);
     return res.redirect(302, '/og-image.png');
   }
+});
+
+/* =========================================================================
+   PROFILE SHARE PAGES (/u/:id) AND IMAGES (/og/profile/:id.jpg)
+   Crawlers never see the #fragment of /#/u/<id>, so profile links use /u/<id>.
+   Only public data goes into meta tags and images: never WhatsApp, email or
+   phone, and hidden, suspended or unknown profiles get the generic card.
+   ========================================================================= */
+export function isProfileShareable(p: any): boolean {
+  return Boolean(p && p.id && p.name && !p.hidden && !p.suspended && !p.hidden_by_moderation && !p.deleted);
+}
+
+/** Removes email addresses and phone-like numbers (7+ digits) from free text. */
+export function scrubContactInfo(text: unknown): string {
+  return stripControlChars(text)
+    .replace(/[^\s<>"'()]+@[^\s<>"'()]+\.[a-z]{2,}/gi, '')
+    .replace(/\+?\d[\d\s().-]{5,}\d/g, m => (m.replace(/\D/g, '').length >= 7 ? '' : m))
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function truncateText(text: string, max: number): string {
+  return text.length > max ? text.slice(0, max - 1).trimEnd() + '…' : text;
+}
+
+/** Public text shown for a profile in meta tags and the share image. */
+export function profileShareText(p: any): { name: string; headline: string; description: string } {
+  const name = truncateText(scrubContactInfo(p?.name) || 'Member', 80);
+  const headline = truncateText(scrubContactInfo(p?.headline || p?.role || ''), 120);
+  const offers = scrubContactInfo(p?.offers || '');
+  const description = offers
+    ? truncateText(offers, 150)
+    : headline || `${name} on ${BRAND_NAME}`;
+  return { name, headline, description };
+}
+
+/** Up to 2 earned badges: Hack Day team, event organiser, events attended. */
+export function profileOgBadges(p: any): string[] {
+  const badges: string[] = [];
+  if ((store.team || []).some((m: any) => m?.linked_profile_id === p?.id && !m.hidden)) {
+    badges.push('1st place · Hack Day Kampala 2026');
+  }
+  if (p?.is_organiser) badges.push('Event organiser');
+  const attended = new Set(
+    (store.event_checkins || []).filter((c: any) => c?.kind === 'member' && c.ref_id === p?.id).map((c: any) => c.event_id)
+  ).size;
+  if (attended > 0) badges.push(attended === 1 ? 'Attended 1 event' : `Attended ${attended} events`);
+  return badges.slice(0, 2);
+}
+
+export function computeProfileOgVersionHash(p: any): string {
+  const { name, headline } = profileShareText(p);
+  const avatar = String(p?.avatar || '');
+  const raw = `v${OG_RENDER_VERSION}|${p?.updated_at || ''}|${name}|${headline}|${avatar.length}:${avatar.slice(-24)}|${profileOgBadges(p).join(',')}`;
+  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 10);
+}
+
+/** Canonical share link for a profile. */
+export function profileShareUrl(id: string): string {
+  return `${getPublicAppUrl()}/u/${encodeURIComponent(String(id))}`;
+}
+
+export function injectProfileOgIntoHtml(baseHtml: string, p: any): string {
+  const appBase = getPublicAppUrl();
+  const safeId = encodeURIComponent(String(p.id || ''));
+  const { name, headline, description } = profileShareText(p);
+  const title = headline ? `${name} · ${headline}` : `${name} · ${BRAND_NAME}`;
+  return injectOgIntoHtml(baseHtml, {
+    docTitle: `${title} · ${BRAND_NAME}`,
+    title,
+    description,
+    url: `${appBase}/u/${safeId}`,
+    image: `${appBase}/og/profile/${safeId}.jpg?v=${computeProfileOgVersionHash(p)}`,
+    imageAlt: `${name} on ${BRAND_NAME}`,
+    type: 'profile',
+    pathPrefix: '/u/',
+    hashRoute: `/#/u/${safeId}`
+  });
+}
+
+app.get('/u/:id', (req: Request, res: Response) => {
+  const profile = (store.profiles || []).find((p: any) => p.id === req.params.id);
+  const baseHtml = getIndexHtmlTemplate();
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  if (!isProfileShareable(profile)) {
+    return res.status(200).send(baseHtml);
+  }
+  return res.status(200).send(injectProfileOgIntoHtml(baseHtml, profile));
+});
+
+const PROFILE_OG_AVATAR = 300;
+const PROFILE_OG_AVATAR_X = 80;
+const PROFILE_OG_AVATAR_Y = 175;
+
+/** Photo bytes for the share image: stored photos, or Google account photos (short timeout, size cap). */
+async function resolveProfileAvatarBuffer(p: any): Promise<Buffer | null> {
+  const avatar = String(p?.avatar || '');
+  const match = avatar.match(/^data:image\/(?:jpeg|jpg|png|webp|gif);base64,([A-Za-z0-9+/=\s]+)$/i);
+  if (match) {
+    try {
+      return Buffer.from(match[1], 'base64');
+    } catch (_) {
+      return null;
+    }
+  }
+  if (/^https:\/\/[a-z0-9-]+\.googleusercontent\.com\//i.test(avatar)) {
+    try {
+      const r = await fetch(avatar, { signal: AbortSignal.timeout(2500), redirect: 'error' });
+      if (!r.ok || Number(r.headers.get('content-length') || 0) > 2_000_000) return null;
+      const buf = Buffer.from(await r.arrayBuffer());
+      return buf.length <= 2_000_000 ? buf : null;
+    } catch (_) {
+      return null;
+    }
+  }
+  return null;
+}
+
+function initialsFor(name: string): string {
+  const parts = name.split(/\s+/).filter(Boolean);
+  const letters = (parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : (parts[0] || '').slice(0, 2)).toUpperCase();
+  return canInterRender(letters) ? letters : '';
+}
+
+/** SVG for a profile share image; the photo (if any) is composited on top at the avatar position. */
+export function buildProfileOgSvg(p: any, hasPhoto: boolean): string {
+  const { name, headline } = profileShareText(p);
+  const badges = profileOgBadges(p).filter(canInterRender);
+  const e = escapeHtml;
+  const nameLine = canInterRender(name) ? truncateText(name, 22) : '';
+  let [h1, h2] = headline && canInterRender(headline) ? wrapTitleLines(headline, 36) : ['', ''];
+  // A cut second line ends on a whole word
+  if (h2 && h2.endsWith('…') && h2.lastIndexOf(' ') > 12) h2 = h2.slice(0, h2.lastIndexOf(' ')).replace(/[\s,.;:·-]+$/, '') + '…';
+  const cx = PROFILE_OG_AVATAR_X + PROFILE_OG_AVATAR / 2;
+  const cy = PROFILE_OG_AVATAR_Y + PROFILE_OG_AVATAR / 2;
+  const seed = [...String(p?.id || name)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const circleFill = seed % 2 === 0 ? '#F5B700' : '#12B5A6';
+  const initials = initialsFor(name);
+  const textX = 440;
+  let y = 262;
+  const lines: string[] = [];
+  if (nameLine) {
+    lines.push(`<text x="${textX}" y="${y}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="60" font-weight="800">${e(nameLine)}</text>`);
+    y += 62;
+  }
+  for (const line of [h1, h2].filter(Boolean) as string[]) {
+    lines.push(`<text x="${textX}" y="${y}" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="36" font-weight="500">${e(line)}</text>`);
+    y += 46;
+  }
+  y += 24;
+  for (const badge of badges) {
+    lines.push(`<circle cx="${textX + 9}" cy="${y - 11}" r="8" fill="#F5B700"/>`);
+    lines.push(`<text x="${textX + 30}" y="${y}" fill="#F5B700" font-family="Inter, sans-serif" font-size="34" font-weight="600">${e(truncateText(badge, 36))}</text>`);
+    y += 48;
+  }
+  const avatarBlock = hasPhoto
+    ? `<circle cx="${cx}" cy="${cy}" r="${PROFILE_OG_AVATAR / 2 + 8}" fill="url(#ring)"/>`
+    : `<circle cx="${cx}" cy="${cy}" r="${PROFILE_OG_AVATAR / 2 + 8}" fill="url(#ring)"/>
+    <circle cx="${cx}" cy="${cy}" r="${PROFILE_OG_AVATAR / 2}" fill="${circleFill}"/>
+    ${initials ? `<text x="${cx}" y="${cy + 40}" text-anchor="middle" fill="#0B1220" font-family="Inter, sans-serif" font-size="118" font-weight="800">${e(initials)}</text>` : markGroup(cx - 90, cy - 90, 180)}`;
+  return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+    ${ogBackgroundSvg()}
+    <defs>
+      <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#F5B700"/>
+        <stop offset="100%" stop-color="#12B5A6"/>
+      </linearGradient>
+    </defs>
+    ${ogHeaderSvg(80, 62)}
+    ${avatarBlock}
+    ${lines.join('\n    ')}
+    <text x="${PROFILE_OG_AVATAR_X}" y="568" fill="#2DD4BF" font-family="Inter, sans-serif" font-size="34" font-weight="700">${e(PRIMARY_HOST)}</text>
+  </svg>`;
+}
+
+export async function renderProfileOgJpeg(p: any): Promise<Buffer> {
+  await ensureFontConfigInitialized();
+  let photo: Buffer | null = null;
+  const raw = await resolveProfileAvatarBuffer(p);
+  if (raw) {
+    try {
+      const mask = Buffer.from(`<svg width="${PROFILE_OG_AVATAR}" height="${PROFILE_OG_AVATAR}"><circle cx="${PROFILE_OG_AVATAR / 2}" cy="${PROFILE_OG_AVATAR / 2}" r="${PROFILE_OG_AVATAR / 2}" fill="#fff"/></svg>`);
+      photo = await sharp(raw)
+        .rotate()
+        .resize(PROFILE_OG_AVATAR, PROFILE_OG_AVATAR, { fit: 'cover', position: 'attention' })
+        .composite([{ input: mask, blend: 'dest-in' }])
+        .png()
+        .toBuffer();
+    } catch (_) {
+      photo = null; // unreadable photo: initials instead
+    }
+  }
+  const base = sharp(Buffer.from(buildProfileOgSvg(p, Boolean(photo)))).resize(1200, 630);
+  const composed = photo ? base.composite([{ input: photo, left: PROFILE_OG_AVATAR_X, top: PROFILE_OG_AVATAR_Y }]) : base;
+  let out = await composed.jpeg({ quality: 82 }).toBuffer();
+  if (out.length > 300 * 1024) {
+    out = await sharp(out).jpeg({ quality: 65 }).toBuffer();
+  }
+  return out;
+}
+
+app.get('/og/profile/:id.jpg', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const profile = (store.profiles || []).find((p: any) => p.id === id);
+  if (!isProfileShareable(profile)) {
+    return res.redirect(302, '/og-image.png');
+  }
+  const fontsOk = await ensureFontConfigInitialized();
+  if (!fontsOk) {
+    console.warn('[OG Image] Fonts not available, redirecting to /og-image.png');
+    return res.redirect(302, '/og-image.png');
+  }
+
+  const vHash = computeProfileOgVersionHash(profile);
+  const cacheKey = `profile:${id}:${vHash}`;
+  const etag = `"p-${id}-${vHash}"`;
+  if (req.headers['if-none-match'] === etag && ogImageLruCache.has(cacheKey)) {
+    res.setHeader('ETag', etag);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.status(304).end();
+  }
+
+  let jpeg = ogImageLruCache.get(cacheKey);
+  if (jpeg) {
+    ogImageLruCache.delete(cacheKey);
+    ogImageLruCache.set(cacheKey, jpeg);
+  } else {
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    try {
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error('OG image render timeout')), 5000);
+      });
+      jpeg = await Promise.race([renderProfileOgJpeg(profile), timeout]);
+    } catch (err: any) {
+      console.warn('[OG Image] Failed to render profile OG image:', err?.message || err);
+      return res.redirect(302, '/og-image.png');
+    } finally {
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+    }
+    if (ogImageLruCache.size >= OG_IMAGE_LRU_MAX) {
+      const oldestKey = ogImageLruCache.keys().next().value;
+      if (oldestKey) ogImageLruCache.delete(oldestKey);
+    }
+    ogImageLruCache.set(cacheKey, jpeg);
+  }
+  res.setHeader('Content-Type', 'image/jpeg');
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.setHeader('ETag', etag);
+  return res.status(200).send(jpeg);
 });
 
 // Mark Notification as Read (own notifications only)
