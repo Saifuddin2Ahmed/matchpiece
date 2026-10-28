@@ -4,6 +4,21 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.3] - 2026-10-28
+
+### Changed
+- The GitHub repository is now https://github.com/Saifuddin2Ahmed/matchpiece. The old address https://github.com/Saifuddin2Ahmed/kwegatta redirects there. All links in the app, the README, the contributing guide and the docs use the new address.
+- The README now starts with "Matchpiece (formerly Kwegatta)", a short description, the award, the live link and how to run it on your own machine.
+- Event confirmation emails no longer have an attached .ics file. They now have two "Add to calendar" links instead: one for Google Calendar and one that downloads the event for other calendar apps.
+- Event emails come from "Matchpiece Events". Replies go to the event's contact email, or to the Matchpiece sender address when the event has none. Each email has a short preview line for the inbox list and a small logo with a text description.
+- The email footer now reads "You received this because you registered on Matchpiece. Reply to this email if you have questions."
+
+### Added
+- New public link /api/events/<id>/calendar.ics downloads an event as a calendar file. It works only for published events and never contains the online meeting link, which stays visible to registered members only.
+
+### Fixed
+- Calendar files now handle commas, semicolons and long text correctly, so calendar apps show the title and description in full.
+
 ## [1.13.2] - 2026-10-28
 
 ### Added
