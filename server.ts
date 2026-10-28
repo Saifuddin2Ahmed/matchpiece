@@ -6387,36 +6387,96 @@ export function verifySelfCheckinToken(
   return { valid: false };
 }
 
-export function generateEventIcsContent(item: any): string {
-  const toIcsUtc = (iso?: string) => {
-    const d = iso ? new Date(iso) : new Date();
-    if (isNaN(d.getTime())) return new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-    return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+/** Escapes TEXT values per RFC 5545 (backslash, semicolon, comma, newline). */
+function icsText(s: any): string {
+  return String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+}
+
+/** Folds a content line to 75 octets per RFC 5545. */
+function foldIcsLine(line: string): string {
+  const bytes = Buffer.from(line, 'utf-8');
+  if (bytes.length <= 75) return line;
+  const out: string[] = [];
+  let cur = '';
+  let curLen = 0;
+  for (const ch of line) {
+    const len = Buffer.byteLength(ch, 'utf-8');
+    const limit = out.length === 0 ? 75 : 74;
+    if (curLen + len > limit) {
+      out.push(cur);
+      cur = '';
+      curLen = 0;
+    }
+    cur += ch;
+    curLen += len;
+  }
+  out.push(cur);
+  return out.join('\r\n ');
+}
+
+/** Start and end of an event as Date objects (end defaults to start + 2 hours). */
+function eventStartEnd(item: any): { start: Date; end: Date } {
+  const parse = (iso?: string) => {
+    const d = iso ? new Date(iso) : new Date(NaN);
+    return isNaN(d.getTime()) ? null : d;
   };
-  const startUtc = toIcsUtc(item.starts_at || item.datetime || item.created_at);
-  const endUtc = item.ends_at
-    ? toIcsUtc(item.ends_at)
-    : toIcsUtc(new Date(new Date(item.starts_at || item.datetime || Date.now()).getTime() + 7200000).toISOString());
-  const loc = item.format === 'online' ? (item.join_link || 'Online') : (item.venue || item.location || 'Kampala');
-  const clean = (s: string) => String(s || '').replace(/\r?\n/g, '\\n');
-  const shareUrl = `${getPublicAppUrl()}/e/${item.id}`;
+  const start = parse(item?.starts_at || item?.datetime) || parse(item?.created_at) || new Date();
+  const end = parse(item?.ends_at) || new Date(start.getTime() + 7200000);
+  return { start, end };
+}
+
+/** 20261114T110000Z */
+function toCalendarUtc(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+/** Public place text: the online join link is for registered members only, so it is never put in public files or links. */
+function publicEventLocation(item: any): string {
+  return item?.format === 'online' ? 'Online (link on the event page)' : String(item?.venue || item?.location || 'Kampala');
+}
+
+export function eventCalendarIcsUrl(item: any): string {
+  return `${getPublicAppUrl()}/api/events/${encodeURIComponent(String(item?.id || ''))}/calendar.ics`;
+}
+
+/** Google Calendar "add event" link with the same details as the .ics file. */
+export function googleCalendarUrl(item: any): string {
+  const { start, end } = eventStartEnd(item);
+  const eventUrl = `${getPublicAppUrl()}/e/${encodeURIComponent(String(item?.id || ''))}`;
+  const details = [String(item?.description || '').trim(), `Event page: ${eventUrl}`].filter(Boolean).join('\n\n');
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: String(item?.title || 'Event'),
+    dates: `${toCalendarUtc(start)}/${toCalendarUtc(end)}`,
+    details: details.slice(0, 1500),
+    location: publicEventLocation(item)
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+export function generateEventIcsContent(item: any): string {
+  const { start, end } = eventStartEnd(item);
+  const shareUrl = `${getPublicAppUrl()}/e/${encodeURIComponent(String(item?.id || ''))}`;
 
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     `PRODID:-//${BRAND_NAME}//Events//EN`,
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
     'BEGIN:VEVENT',
+    // UID domain kept so calendars that already imported an event update it instead of adding a copy.
     `UID:${item.id}@kwegatta.ai.studio`,
-    `DTSTAMP:${toIcsUtc(new Date().toISOString())}`,
-    `DTSTART:${startUtc}`,
-    `DTEND:${endUtc}`,
-    `SUMMARY:${clean(item.title)}`,
-    `DESCRIPTION:${clean(item.description)}`,
-    `LOCATION:${clean(loc)}`,
+    `DTSTAMP:${toCalendarUtc(new Date())}`,
+    `DTSTART:${toCalendarUtc(start)}`,
+    `DTEND:${toCalendarUtc(end)}`,
+    `SUMMARY:${icsText(item.title)}`,
+    `DESCRIPTION:${icsText(item.description)}`,
+    `LOCATION:${icsText(publicEventLocation(item))}`,
     `URL:${shareUrl}`,
     'END:VEVENT',
     'END:VCALENDAR'
-  ].join('\r\n');
+  ].map(foldIcsLine).join('\r\n') + '\r\n';
 }
 
 let testMailSender: ((mailOptions: any) => Promise<any>) | null = null;
@@ -6496,6 +6556,9 @@ export function buildEventEmail(
   // A deleted event has no page any more, so that email links to the app instead.
   const eventGone = kind === 'event_cancelled';
   const appUrl = getPublicAppUrl();
+  const hasTicket = !eventGone && kind !== 'cancelled';
+  const googleUrl = hasTicket ? googleCalendarUrl(item) : '';
+  const icsUrl = hasTicket ? eventCalendarIcsUrl(item) : '';
 
   const subject = kind === 'promotion'
     ? `A spot opened up: ${title}`
@@ -6515,8 +6578,14 @@ export function buildEventEmail(
     ? `Online link: ${joinLink || 'Provided on event page'}`
     : `Venue: ${venue}`;
   const footer = onWaitlist
-    ? `You received this because you joined the waitlist on ${BRAND_NAME}. Reply to contact the organiser.`
-    : `You received this because you registered on ${BRAND_NAME}. Reply to contact the organiser.`;
+    ? `You received this because you joined the waitlist on ${BRAND_NAME}. Reply to this email if you have questions.`
+    : `You received this because you registered on ${BRAND_NAME}. Reply to this email if you have questions.`;
+  // Short line shown next to the subject in the inbox list.
+  const preheader = kind === 'cancelled'
+    ? `Your registration for ${title} is cancelled.`
+    : kind === 'event_cancelled'
+    ? `${title} will not take place.`
+    : `${when}. Your ticket and calendar links are inside.`;
 
   const text = [
     `Hi ${name},`,
@@ -6530,7 +6599,7 @@ export function buildEventEmail(
       ? [`Find other events: ${appUrl}`]
       : kind === 'cancelled'
       ? [`Event page: ${eventUrl}`, 'Changed your mind? You can register again from the event page while spots are open.']
-      : [`Event page: ${eventUrl}`, `View your ticket: ${ticketHref}`, '', 'An .ics calendar invite is attached to this email.']),
+      : [`Event page: ${eventUrl}`, `View your ticket: ${ticketHref}`, '', `Add to Google Calendar: ${googleUrl}`, `Add to other calendars (.ics): ${icsUrl}`]),
     '',
     footer
   ].join('\n');
@@ -6548,9 +6617,10 @@ export function buildEventEmail(
     '<!doctype html>',
     '<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + e(subject) + '</title></head>',
     '<body style="margin:0;padding:0;background:#f3f4f6;">',
+    `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;mso-hide:all;">${e(preheader)}</div>`,
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;"><tr><td align="center" style="padding:16px 8px;">',
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:12px;font-family:Arial,Helvetica,sans-serif;">',
-    '<tr><td style="padding:20px 24px;border-bottom:1px solid #e5e7eb;"><span style="font-size:22px;font-weight:bold;color:#0f766e;letter-spacing:0.5px;">' + escapeHtml(BRAND_NAME) + '</span></td></tr>',
+    `<tr><td style="padding:20px 24px;border-bottom:1px solid #e5e7eb;"><img src="${e(appUrl)}/icon-192.png" width="28" height="28" alt="${e(BRAND_NAME)} logo" style="vertical-align:middle;border:0;margin-right:8px;"><span style="font-size:22px;font-weight:bold;color:#0f766e;letter-spacing:0.5px;vertical-align:middle;">${e(BRAND_NAME)}</span></td></tr>`,
     '<tr><td style="padding:24px;">',
     `<p style="margin:0 0 12px;font-size:15px;color:#111827;">Hi ${e(name)},</p>`,
     `<p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.5;">${e(lead)}</p>`,
@@ -6569,7 +6639,7 @@ export function buildEventEmail(
       ? ''
       : kind === 'cancelled'
       ? '<p style="margin:8px 0 0;font-size:13px;color:#6b7280;">Changed your mind? You can register again from the event page while spots are open.</p>'
-      : '<p style="margin:8px 0 0;font-size:13px;color:#6b7280;">Add to calendar: open the attached event.ics file.</p>',
+      : `<p style="margin:8px 0 0;font-size:13px;color:#6b7280;">Add to calendar: <a href="${e(googleUrl)}" style="color:#0f766e;">Google Calendar</a> or <a href="${e(icsUrl)}" style="color:#0f766e;">other calendars (.ics)</a></p>`,
     eventGone
       ? ''
       : `<p style="margin:12px 0 0;font-size:13px;color:#6b7280;">Event page: <a href="${e(eventUrl)}" style="color:#0f766e;word-break:break-all;">${e(eventUrl)}</a></p>`,
@@ -6608,7 +6678,12 @@ async function deliverEventEmail(mailOptions: any): Promise<boolean> {
     return false;
   }
 
-  const fullOptions = { ...mailOptions, from: buildEmailFrom(smtpUser) };
+  const fullOptions = {
+    ...mailOptions,
+    from: buildEmailFrom(smtpUser),
+    replyTo: String(mailOptions.replyTo || '').trim() || smtpUser,
+    messageId: `<${crypto.randomUUID()}@${PRIMARY_HOST}>`
+  };
   try {
     if (isTestEnv() && testMailSender) {
       await testMailSender(fullOptions);
@@ -6652,14 +6727,7 @@ export async function sendEventConfirmationEmail(
     ...(item.contact_email ? { replyTo: item.contact_email } : {}),
     subject,
     text,
-    html,
-    attachments: [
-      {
-        filename: 'event.ics',
-        content: generateEventIcsContent(item),
-        contentType: 'text/calendar; charset=utf-8'
-      }
-    ]
+    html
   });
 }
 
@@ -6879,6 +6947,19 @@ function buildWaitlistDetails(item: any): any[] {
     }
   });
 }
+
+// Public "add to calendar" file linked from confirmation emails. Same visibility as the public event page.
+app.get('/api/events/:id/calendar.ics', (req: Request, res: Response) => {
+  const item = (store.events || []).find((e: any) => e.id === req.params.id);
+  if (!item || item.hidden_by_moderation || item.published === false || item.status === 'pending' || item.status === 'rejected') {
+    return res.status(404).type('text/plain').send('Event not found');
+  }
+  const slug = String(item.title || 'event').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'event';
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${slug}.ics"`);
+  res.setHeader('Cache-Control', 'public, max-age=300');
+  res.send(generateEventIcsContent(item));
+});
 
 app.get('/api/events/:id', (req: Request, res: Response) => {
   cleanupExpiredGuestRecords();

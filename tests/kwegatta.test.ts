@@ -4805,8 +4805,8 @@ describe('Release 1.5.0 Features', () => {
           expect(sentEmails[0].to).toBe('attendee@kwegatta.org');
           expect(sentEmails[0].replyTo).toBe('host@kwegatta.org');
           expect(sentEmails[0].text).toContain(`#/events/${ev.id}/ticket`);
-          expect(sentEmails[0].attachments[0].filename).toBe('event.ics');
-          expect(sentEmails[0].attachments[0].content).toContain('BEGIN:VCALENDAR');
+          expect(sentEmails[0].attachments).toBeUndefined();
+          expect(sentEmails[0].text).toContain('/calendar.ics');
         } finally {
           setMailSenderForTest(null);
           if (prevUser === undefined) delete process.env.SMTP_USER;

@@ -286,16 +286,17 @@ describe('Email: HTML part, escaping, From name and logging', () => {
   it('escapes all user text in the HTML part and keeps the plain-text part', () => {
     const { html, text } = buildEventEmail('confirmation', nasty, '<i>Ann</i>', 'https://kwegatta.test/#/events/mail-ev-1/ticket');
     expect(html).not.toContain('<script>');
-    expect(html).not.toContain('<img');
+    expect(html.match(/<img/g)).toHaveLength(1);
+    expect(html).toMatch(/<img src="[^"]+\/icon-192\.png"[^>]*alt="Matchpiece logo"/);
     expect(html).not.toContain('<b>Org</b>');
     expect(html).not.toContain('<i>Ann</i>');
     expect(html).toContain('&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; Friends');
     expect(html).toContain('Hall &quot;A&quot;');
     expect(html).toContain('View your ticket');
     expect(html).toContain('Sat, 14 Nov 2026 · 2:00 PM EAT');
-    expect(html).toContain('You received this because you registered on Matchpiece. Reply to contact the organiser.');
+    expect(html).toContain('You received this because you registered on Matchpiece. Reply to this email if you have questions.');
     expect(html).toContain('Add to calendar');
-    expect(html).not.toMatch(/<style|<link|<img/i);
+    expect(html).not.toMatch(/<style|<link/i);
     expect(text).toContain('Date & Time: Sat, 14 Nov 2026 · 2:00 PM EAT');
     expect(text).toContain('View your ticket: https://kwegatta.test/#/events/mail-ev-1/ticket');
   });
@@ -306,12 +307,12 @@ describe('Email: HTML part, escaping, From name and logging', () => {
     expect(html).toContain('Provided on event page');
   });
 
-  it('confirmation email has html, text and the .ics attachment', async () => {
+  it('confirmation email has html and text and no attachment', async () => {
     sent.length = 0;
     expect(await sendEventConfirmationEmail(nasty, 'ann@kwegatta.test', 'Ann', 'https://kwegatta.test/t')).toBe(true);
     expect(sent[0].html).toContain('<!doctype html>');
     expect(sent[0].text).toContain('Hi Ann,');
-    expect(sent[0].attachments[0].filename).toBe('event.ics');
+    expect(sent[0].attachments).toBeUndefined();
     expect(sent[0].from).toBe(`"Matchpiece Events" <${SMTP_USER}>`);
   });
 
