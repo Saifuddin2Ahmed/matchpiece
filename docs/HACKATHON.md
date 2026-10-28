@@ -25,7 +25,7 @@ This document contains the official hackathon details, compliance checklist, and
 | Requirement | How Matchpiece Visibly Meets the Requirement |
 | ----------- | ------------------------------------------ |
 | **a) Open-source or open-weight AI is an important part of the project** | **MET**: Every AI capability in Matchpiece (profile synthesis, complementary matchmaking, post classification, and learning recommendations) runs exclusively on the open-weight model `gemma-4-31b-it`. No closed or proprietary models (Gemini, GPT) are used anywhere in the codebase. |
-| **b) Public GitHub repository with an open-source licence** | **MET**: Public repository at [https://github.com/Saifuddin2Ahmed/kwegatta](https://github.com/Saifuddin2Ahmed/kwegatta) under the OSI-approved **MIT License** (`LICENSE`). |
+| **b) Public GitHub repository with an open-source licence** | **MET**: Public repository at [https://github.com/Saifuddin2Ahmed/matchpiece](https://github.com/Saifuddin2Ahmed/matchpiece) under the OSI-approved **MIT License** (`LICENSE`). |
 | **c) README explains what we built, how to run or try it, names the model and key dependencies, with a link to the model's licence** | **MET**: The comprehensive `README.md` documents what Matchpiece is, provides step-by-step local setup instructions, lists key dependencies, and explicitly names `gemma-4-31b-it` with direct links to its [Apache 2.0 open-weights license](https://ai.google.dev/gemma/docs/core). |
 | **d) Working demo and a clear explanation** | **MET**: Live deployed app running at [https://matchpiece.ai.studio](https://matchpiece.ai.studio) with an interactive 3-minute demo script detailed in [docs/DEMO-SCRIPT.md](DEMO-SCRIPT.md). |
 
@@ -43,7 +43,7 @@ Find the people you should build and learn with. A student networking and peer-l
 https://matchpiece.ai.studio
 
 ### Repository URL
-https://github.com/Saifuddin2Ahmed/kwegatta
+https://github.com/Saifuddin2Ahmed/matchpiece
 
 ### Technologies Used
 * **AI Model**: `gemma-4-31b-it` (Open-Weight Large Language Model, Apache 2.0)

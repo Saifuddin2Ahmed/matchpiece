@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Shield, Lock, Eye, Download, Trash2, Mail, ExternalLink } from 'lucide-react';
-import { BRAND_NAME } from '../lib/brand';
+import { BRAND_NAME, REPO_URL } from '../lib/brand';
 
 interface PrivacyViewProps {
   onBack: () => void;
@@ -182,7 +182,7 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onBack }) => {
           <p className="text-xs text-[var(--fg-muted)] mt-0.5">Reach out to our maintainers on GitHub or email.</p>
         </div>
         <a
-          href="https://github.com/Saifuddin2Ahmed/kwegatta/issues"
+          href={`${REPO_URL}/issues`}
           target="_blank"
           rel="noopener noreferrer"
           className="kw-btn kw-btn-gold text-xs py-2 px-4 flex items-center gap-1.5"

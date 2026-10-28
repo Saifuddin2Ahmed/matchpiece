@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, Check, Copy, ExternalLink, Github, MapPin } from 'lucide-react';
 import { useDialogA11y } from '../hooks/useDialogA11y';
-import { BRAND_NAME } from '../lib/brand';
+import { BRAND_NAME, REPO_URL } from '../lib/brand';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -121,7 +121,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
           </a>
 
           <a
-            href="https://github.com/Saifuddin2Ahmed/kwegatta/issues"
+            href={`${REPO_URL}/issues`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full kw-btn kw-btn-ghost text-xs py-2 px-3 flex items-center justify-center gap-2 border border-[var(--card-border)] hover:border-[var(--teal)]"

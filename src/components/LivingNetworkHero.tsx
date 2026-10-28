@@ -13,7 +13,7 @@ import { Profile } from '../types';
 import { getInitials, MIN_MEMBERS_FOR_STATS } from '../utils';
 import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
-import { BRAND_NAME, BRAND_FORMERLY } from '../lib/brand';
+import { BRAND_NAME, BRAND_FORMERLY, REPO_URL } from '../lib/brand';
 
 export interface HeroProps {
   profiles: Profile[];
@@ -418,7 +418,7 @@ export const KampalaStorySection: React.FC<KampalaStoryProps> = () => {
       {/* GitHub Repository Link */}
       <div className="pt-2">
         <a
-          href="https://github.com/Saifuddin2Ahmed/kwegatta"
+          href={REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="kw-btn kw-btn-ghost text-xs sm:text-sm py-2.5 px-4 inline-flex items-center gap-2 active:scale-95"

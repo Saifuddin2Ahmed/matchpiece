@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Scale, Github, ExternalLink } from 'lucide-react';
-import { BRAND_NAME, LICENSE_HOLDER } from '../lib/brand';
+import { BRAND_NAME, LICENSE_HOLDER, REPO_URL } from '../lib/brand';
 
 interface LicenseViewProps {
   onBack: () => void;
@@ -69,7 +69,7 @@ export const LicenseView: React.FC<LicenseViewProps> = ({ onBack }) => {
           View official source repository and license file:
         </span>
         <a
-          href="https://github.com/Saifuddin2Ahmed/kwegatta/blob/main/LICENSE"
+          href={`${REPO_URL}/blob/main/LICENSE`}
           target="_blank"
           rel="noopener noreferrer"
           className="kw-btn kw-btn-gold text-xs py-2 px-4 flex items-center gap-1.5"

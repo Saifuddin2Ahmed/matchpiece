@@ -20,7 +20,7 @@ import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
 import { HEADER_IMAGES } from '../lib/headerImages';
 import { TeamGrid } from './TeamGrid';
-import { BRAND_NAME, BRAND_FORMERLY, AWARD_LINE } from '../lib/brand';
+import { BRAND_NAME, BRAND_FORMERLY, AWARD_LINE, REPO_URL } from '../lib/brand';
 
 interface AboutViewProps {
   onNavigateHome: () => void;
@@ -366,7 +366,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
           <p className="text-sm text-[var(--fg-muted)]">
             {BRAND_NAME} is free, open-source software under the MIT licence.{' '}
             <a
-              href="https://github.com/Saifuddin2Ahmed/kwegatta/blob/main/LICENSE"
+              href={`${REPO_URL}/blob/main/LICENSE`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[var(--teal-text)] font-medium underline underline-offset-2 hover:no-underline inline-flex items-center gap-1"
@@ -376,7 +376,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
             </a>
           </p>
           <a
-            href="https://github.com/Saifuddin2Ahmed/kwegatta"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="kw-btn kw-btn-gold text-xs py-2 px-4 inline-flex items-center gap-2 font-semibold shrink-0 self-start sm:self-auto"

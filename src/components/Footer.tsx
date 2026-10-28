@@ -1,7 +1,7 @@
 import React from 'react';
 import { Github } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
-import { BRAND_TAGLINE, COPYRIGHT_LINE } from '../lib/brand';
+import { BRAND_TAGLINE, COPYRIGHT_LINE, REPO_URL } from '../lib/brand';
 
 interface FooterProps {
   onNavigate: (tab: string, elementId?: string) => void;
@@ -101,7 +101,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Three small outlined pill buttons: [GitHub] [Contribute] [MIT License] */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
           <a
-            href="https://github.com/Saifuddin2Ahmed/kwegatta"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="min-h-[40px] px-3.5 py-1.5 inline-flex items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card)]/60 text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] transition-all"
@@ -110,7 +110,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <span>GitHub</span>
           </a>
           <a
-            href="https://github.com/Saifuddin2Ahmed/kwegatta/blob/main/CONTRIBUTING.md"
+            href={`${REPO_URL}/blob/main/CONTRIBUTING.md`}
             target="_blank"
             rel="noopener noreferrer"
             className="min-h-[40px] px-3.5 py-1.5 inline-flex items-center rounded-full border border-[var(--card-border)] bg-[var(--card)]/60 text-[13px] text-[var(--fg-muted)] hover:text-[var(--fg)] hover:border-[var(--gold)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] transition-all"

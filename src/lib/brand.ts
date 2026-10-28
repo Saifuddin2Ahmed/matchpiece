@@ -1,7 +1,7 @@
 // Product name, tagline and public URLs. The client, the server, index.html
 // (via vite.config.ts) and the tests all read them from here.
 // Internal identifiers (Firestore collections, localStorage keys, the Firebase
-// project, the GitHub repo) keep the old "kwegatta" name on purpose.
+// project, the Cloud Run services) keep the old "kwegatta" name on purpose.
 
 export const BRAND_NAME = 'Matchpiece';
 export const BRAND_TAGLINE = 'Find your missing piece';
@@ -23,6 +23,9 @@ export const BRAND_TEAM_THEN = `the ${BRAND_NAME} team (then ${BRAND_FORMERLY})`
 export const PRIMARY_HOST = 'matchpiece.ai.studio';
 export const PRIMARY_URL = `https://${PRIMARY_HOST}`;
 export const LEGACY_HOST = 'kwegatta.ai.studio';
+
+/** Source code on GitHub. The old /kwegatta address redirects here. */
+export const REPO_URL = 'https://github.com/Saifuddin2Ahmed/matchpiece';
 
 export const EMAIL_FROM_NAME = `${BRAND_NAME} Events`;
 export const AWARD_LINE = `${BRAND_WITH_FORMERLY} won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS.`;

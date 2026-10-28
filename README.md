@@ -1,10 +1,14 @@
-# Matchpiece 🤝
+# Matchpiece (formerly Kwegatta)
 
-*Find your missing piece.* Formerly **Kwegatta**.
+*Find your missing piece.*
 
-[![CI](https://github.com/Saifuddin2Ahmed/kwegatta/actions/workflows/ci.yml/badge.svg)](https://github.com/Saifuddin2Ahmed/kwegatta/actions/workflows/ci.yml)
+Matchpiece helps students and builders find teammates, mentors and study partners. You say what you need and what you offer, and Matchpiece suggests people whose offer meets your need. It also runs events with registration, tickets and check-in. It won **1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS** and is built with the open-weight **Gemma 4** model.
+
+**Live app:** https://matchpiece.ai.studio
+
+[![CI](https://github.com/Saifuddin2Ahmed/matchpiece/actions/workflows/ci.yml/badge.svg)](https://github.com/Saifuddin2Ahmed/matchpiece/actions/workflows/ci.yml)
 [![Hacktoberfest 2026](https://img.shields.io/badge/Hacktoberfest-2026-ff7a00.svg?style=flat-square&logo=hacktoberfest)](https://hacktoberfest.com/)
-[![Award: 1st Place Hack Day Kampala](https://img.shields.io/badge/Award-1st_Place_·_Hack_Day_Kampala-ffd700.svg?style=flat-square&logo=trophy)](https://github.com/Saifuddin2Ahmed/kwegatta)
+[![Award: 1st Place Hack Day Kampala](https://img.shields.io/badge/Award-1st_Place_·_Hack_Day_Kampala-ffd700.svg?style=flat-square&logo=trophy)](https://github.com/Saifuddin2Ahmed/matchpiece)
 [![Entry: Best Open-Source AI Project](https://img.shields.io/badge/Entry-Best_Open--Source_AI_Project-238636.svg?style=flat-square)](https://www.mlh.com/opensource-ai)
 [![Open-Weight Model: Gemma 4](https://img.shields.io/badge/Model-gemma--4--26b--a4b--it_(default)_|_31b--it-4493f8.svg?style=flat-square)](https://ai.google.dev/gemma/docs/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](./LICENSE)
@@ -17,7 +21,7 @@
 
 * **Live Application**: [https://matchpiece.ai.studio](https://matchpiece.ai.studio)
 * **Old address**: [https://kwegatta.ai.studio](https://kwegatta.ai.studio) redirects page visits to the new address.
-* **GitHub Repository**: [https://github.com/Saifuddin2Ahmed/kwegatta](https://github.com/Saifuddin2Ahmed/kwegatta)
+* **GitHub Repository**: [https://github.com/Saifuddin2Ahmed/matchpiece](https://github.com/Saifuddin2Ahmed/matchpiece) (the old `Saifuddin2Ahmed/kwegatta` address redirects here)
 * **Digital Public Goods Standard**: Designed and documented to be **aligned with** the Digital Public Goods Standard ([docs/DPG-ALIGNMENT.md](docs/DPG-ALIGNMENT.md)).
 
 ---
@@ -83,7 +87,7 @@ Traditional networking fails because:
 | Challenge Requirement | How Matchpiece Meets the Requirement |
 | --------------------- | ---------------------------------- |
 | **a) Open-source or open-weight AI is an important part of the project** | **MET**: Every AI feature in Matchpiece (profile synthesis, complementary matchmaking, post classification, and learning recommendations) runs exclusively on open-weight Gemma 4 models (`gemma-4-26b-a4b-it` as default, `gemma-4-31b-it` as alternative). No closed or proprietary models are used. |
-| **b) Public GitHub repository with an open-source licence** | **MET**: Public repository at [https://github.com/Saifuddin2Ahmed/kwegatta](https://github.com/Saifuddin2Ahmed/kwegatta) under the OSI-approved **MIT License** (`LICENSE`). |
+| **b) Public GitHub repository with an open-source licence** | **MET**: Public repository at [https://github.com/Saifuddin2Ahmed/matchpiece](https://github.com/Saifuddin2Ahmed/matchpiece) under the OSI-approved **MIT License** (`LICENSE`). |
 | **c) README explains what we built, how to run or try it, names the model and key dependencies, with a link to the model's licence** | **MET**: This README explains Matchpiece in detail, provides local run instructions, lists dependencies, and links to the [Apache 2.0 license for Gemma 4](https://ai.google.dev/gemma/docs/core). |
 | **d) A working demo and a clear explanation** | **MET**: Live deployed app running at [https://matchpiece.ai.studio](https://matchpiece.ai.studio) with a step-by-step walkthrough in [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md). |
 
@@ -193,7 +197,7 @@ Read our full privacy policy in [PRIVACY.md](PRIVACY.md) and schema specificatio
 * **Styling**: Tailwind CSS with GitHub Primer design tokens (light and dark themes)
 * **Icons**: Lucide Icons
 * **QR Codes**: `qrcode` library
-* **Backend**: Node.js 20+, Express
+* **Backend**: Node.js 22+, Express
 * **Database**: Cloud Firestore
 * **AI Model**: `gemma-4-26b-a4b-it` (default) and `gemma-4-31b-it` (alternative) via `@google/genai` on server
 
@@ -202,19 +206,19 @@ Read our full privacy policy in [PRIVACY.md](PRIVACY.md) and schema specificatio
 ## Run Locally
 
 ### Prerequisites
-* Node.js 20+ installed
+* Node.js 22 or newer
 * npm
 * A Google AI Studio API key (for `gemma-4-26b-a4b-it` / `gemma-4-31b-it`)
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Saifuddin2Ahmed/kwegatta.git
-cd kwegatta
+git clone https://github.com/Saifuddin2Ahmed/matchpiece.git
+cd matchpiece
 ```
 
 ### 2. Install Dependencies
 ```bash
-npm install
+npm ci
 ```
 
 ### 3. Configure Environment Variables
@@ -234,11 +238,14 @@ npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 5. Verify Build and Types
+### 5. Check, Test and Build
 ```bash
 npm run lint
+npx vitest run
 npm run build
 ```
+
+Without Firebase credentials the server stores data in a local file (`.kwegatta_store.json`), so you can try everything on your own machine.
 
 ---
 

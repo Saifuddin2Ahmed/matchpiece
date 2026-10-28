@@ -1,11 +1,15 @@
 {
-  "name": "kwegatta",
+  "name": "matchpiece",
   "version": "1.13.2",
   "description": "Network where students and builders match by what they need and offer using the open-weight Gemma 4 model.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Saifuddin2Ahmed/kwegatta.git"
+    "url": "https://github.com/Saifuddin2Ahmed/matchpiece.git"
+  },
+  "homepage": "https://matchpiece.ai.studio",
+  "bugs": {
+    "url": "https://github.com/Saifuddin2Ahmed/matchpiece/issues"
   },
   "keywords": [
     "hacktoberfest",

@@ -48,8 +48,8 @@ We welcome ideas that make student collaboration more accessible:
 1. **Fork the Repository**:
    Click "Fork" on GitHub and clone your fork locally:
    ```bash
-   git clone https://github.com/<your-username>/kwegatta.git
-   cd kwegatta
+   git clone https://github.com/<your-username>/matchpiece.git
+   cd matchpiece
    ```
 
 2. **Install Dependencies**:
