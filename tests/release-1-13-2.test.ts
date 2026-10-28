@@ -17,6 +17,7 @@ import {
 } from '../server';
 import { applyBrandToHtml, profileShareUrl, BRAND_DESCRIPTION } from '../src/lib/brand';
 import { parseAppRoute } from '../src/lib/route';
+import { MARK_SHAPES, markSvg, iconSvg } from '../src/lib/brandMark';
 
 let server: any;
 let port: number;
@@ -265,5 +266,45 @@ describe('Default share card and meta', () => {
     expect(Math.min(...sizes)).toBeGreaterThanOrEqual(32);
     expect(svg).toContain('>Ann Lee<');
     expect(svg).toContain('>AL<');
+  });
+});
+
+describe('Brand mark', () => {
+  it('is two clean arcs (no extra bridge shape) in the brand colours', () => {
+    const shapes = MARK_SHAPES.match(/<path /g) || [];
+    expect(shapes).toHaveLength(2);
+    expect(MARK_SHAPES).toContain('stroke="#F5B700"');
+    expect(MARK_SHAPES).toContain('stroke="#12B5A6"');
+  });
+
+  it('the logo files in public/ are generated from the same source', () => {
+    expect(fs.readFileSync('public/matchpiece-mark.svg', 'utf-8')).toBe(markSvg());
+    expect(fs.readFileSync('public/matchpiece-icon.svg', 'utf-8')).toBe(iconSvg());
+    // Old names stay as copies for pages and installed apps cached before the rename
+    expect(fs.readFileSync('public/kwegatta-mark.svg', 'utf-8')).toBe(markSvg());
+    expect(fs.readFileSync('public/kwegatta-icon.svg', 'utf-8')).toBe(iconSvg());
+  });
+
+  it('header, favicon, manifest and service worker use the new files', () => {
+    expect(fs.readFileSync('src/components/BrandLogo.tsx', 'utf-8')).toContain('src="/matchpiece-mark.svg"');
+    expect(fs.readFileSync('index.html', 'utf-8')).toContain('href="/matchpiece-icon.svg"');
+    const manifest = JSON.parse(fs.readFileSync('public/manifest.webmanifest', 'utf-8'));
+    expect(manifest.icons.map((i: any) => i.src)).toEqual(['/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/matchpiece-icon.svg']);
+    const sw = fs.readFileSync('public/sw.js', 'utf-8');
+    expect(sw).toContain("'/matchpiece-icon.svg'");
+    expect(sw).toContain("'/matchpiece-mark.svg'");
+  });
+
+  it('app icons have the right sizes', async () => {
+    for (const [f, size] of [['favicon-32.png', 32], ['icon-192.png', 192], ['icon-512.png', 512], ['icon-maskable-512.png', 512], ['apple-touch-icon.png', 180]] as const) {
+      const meta = await sharp(`public/${f}`).metadata();
+      expect([meta.width, meta.height], f).toEqual([size, size]);
+    }
+  });
+
+  it('the page head and the manifest no longer mention the old name', async () => {
+    const html = (await request('GET', '/u/no-such-profile-1132')).body.toString();
+    expect(html.slice(0, html.indexOf('</head>'))).not.toMatch(/kwegatta|matchmaking/i);
+    expect(fs.readFileSync('public/manifest.webmanifest', 'utf-8')).not.toMatch(/kwegatta|matchmaking/i);
   });
 });

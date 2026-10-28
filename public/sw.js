@@ -4,8 +4,8 @@ const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/kwegatta-icon.svg',
-  '/kwegatta-mark.svg',
+  '/matchpiece-icon.svg',
+  '/matchpiece-mark.svg',
   '/favicon-32.png'
 ];
 

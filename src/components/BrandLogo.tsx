@@ -16,9 +16,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Brand mark (file name kept from the old name) */}
+      {/* Brand mark (drawn in src/lib/brandMark.ts) */}
       <img
-        src="/kwegatta-mark.svg"
+        src="/matchpiece-mark.svg"
         alt={`${BRAND_NAME} mark`}
         width={pixelSize}
         height={pixelSize}
