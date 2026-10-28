@@ -1,5 +1,7 @@
 # Matchpiece (formerly Kwegatta)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23737410.svg)](https://doi.org/10.5281/zenodo.23737410)
+
 *Find your missing piece.*
 
 Matchpiece helps students and builders find teammates, mentors and study partners. You say what you need and what you offer, and Matchpiece suggests people whose offer meets your need. It also runs events with registration, tickets and check-in. It won **1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS** and is built with the open-weight **Gemma 4** model.
