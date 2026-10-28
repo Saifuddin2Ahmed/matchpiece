@@ -4,6 +4,20 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.2] - 2026-10-28
+
+### Added
+- Profile links now show the person in link previews on WhatsApp, LinkedIn, X and other apps: their photo (or initials), name, headline, up to two badges they have earned and the Matchpiece logo. Share, Copy link, the profile QR code and invite links now use the form https://matchpiece.ai.studio/u/<id>. Older links with /#/u/ still work.
+- Previews never show WhatsApp numbers, email addresses or phone numbers. Hidden or suspended profiles, and links to profiles that do not exist, show the general Matchpiece card.
+
+### Changed
+- New general share image with larger text that is easier to read in small previews: "Find your missing piece", "Teammates · Mentors · Study partners", the Hack Day award and the site address.
+- New description for search results and link previews: "Find teammates, mentors and study partners. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source."
+- Event share images use the same style and larger text. Apps that cached an older event preview fetch the new one.
+
+### Fixed
+- The logo has been redrawn cleanly. The small notch in the teal ring is gone. The header, browser tab icon, app icons and share images all use the new drawing.
+
 ## [1.13.1] - 2026-10-28
 
 ### Fixed
