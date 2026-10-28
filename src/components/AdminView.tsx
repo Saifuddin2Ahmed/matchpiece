@@ -63,6 +63,7 @@ import {
 } from '../services/api';
 import { auth } from '../services/firebase';
 import { CoverImageUploader } from './EventsView';
+import { BRAND_NAME } from '../lib/brand';
 
 interface AdminOverviewData {
   members_count: number;
@@ -815,7 +816,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-lg font-bold font-display">Kwegatta Organiser Dashboard</h1>
+              <h1 className="text-lg font-bold font-display">{BRAND_NAME} Organiser Dashboard</h1>
               {adminStatus?.adminName && (
                 <span className="px-2 py-0.5 rounded text-[13px] font-bold bg-amber-500/15 text-[var(--gold-text)] border border-amber-500/30">
                   {adminStatus.adminName}

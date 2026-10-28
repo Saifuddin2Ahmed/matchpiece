@@ -339,13 +339,13 @@ describe('Member-Submitted Events & Approval Permissions', () => {
 });
 
 describe('Service Worker & Cache-Control Configuration (PWA v1.5.2)', () => {
-  it('public/sw.js specifies CACHE_NAME as kwegatta-1.5.2 and handles cache strategies correctly', async () => {
+  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.0 and handles cache strategies correctly', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const swContent = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf-8');
 
-    // 1. Cache name includes version kwegatta-1.12.0
-    expect(swContent).toContain("CACHE_NAME = 'kwegatta-1.12.0'");
+    // 1. Cache name includes version matchpiece-1.13.0
+    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.0'");
 
     // 2. Skip waiting and clients claim are preserved
     expect(swContent).toContain('self.skipWaiting()');
@@ -5591,7 +5591,7 @@ describe('Release 1.5.0 Features', () => {
 
           expect(
             screen.getByText(
-              /Camera access is blocked\. Allow camera for kwegatta\.ai\.studio in your browser settings, then tap Try again\./i
+              /Camera access is blocked\. Allow camera for matchpiece\.ai\.studio in your browser settings, then tap Try again\./i
             )
           ).toBeTruthy();
           expect(screen.getByRole('button', { name: /Try again/i })).toBeTruthy();
@@ -5747,7 +5747,7 @@ describe('Release 1.5.0 Features', () => {
         const htmlPub = await resPub.text();
 
         // Escaped title & no raw <script>alert("xss")</script>
-        expect(htmlPub).toContain('<title>Kampala AI &amp; &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; Meetup · Kwegatta</title>');
+        expect(htmlPub).toContain('<title>Kampala AI &amp; &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; Meetup · Matchpiece</title>');
         expect(htmlPub).not.toContain('<script>alert("xss")</script>');
         expect(htmlPub).toContain('property="og:image"');
         expect(htmlPub).toContain(`/og/event/${pubId}.jpg?v=`);
@@ -5771,7 +5771,7 @@ describe('Release 1.5.0 Features', () => {
           const htmlHidden = await resHidden.text();
           expect(htmlHidden).not.toContain('Secret Pending Event 1100');
           expect(htmlHidden).not.toContain('Hidden Unpublished Event 1100');
-          expect(htmlHidden).toContain('<title>Kwegatta');
+          expect(htmlHidden).toContain('<title>Matchpiece');
         }
       });
 
@@ -6256,14 +6256,14 @@ describe('Release 1.5.0 Features', () => {
         expect(cardArabic.length).toBeGreaterThan(1000);
       });
 
-      it('b) /e/:id tags use https://kwegatta.ai.studio even when process.env.APP_URL is set to a run.app URL', async () => {
+      it('b) /e/:id tags use https://matchpiece.ai.studio even when process.env.APP_URL is set to a run.app URL', async () => {
         const origAppUrl = process.env.APP_URL;
         const origShareUrl = process.env.PUBLIC_SHARE_URL;
         try {
           process.env.APP_URL = 'https://kwegatta-359429599502.us-west1.run.app';
           delete process.env.PUBLIC_SHARE_URL;
 
-          expect(getPublicAppUrl()).toBe('https://kwegatta.ai.studio');
+          expect(getPublicAppUrl()).toBe('https://matchpiece.ai.studio');
 
           const testEvent = {
             id: 'ev-canonical-test-1101',
@@ -6276,10 +6276,10 @@ describe('Release 1.5.0 Features', () => {
           const rawHtml = '<!DOCTYPE html><html><head><title>Default</title></head><body>App</body></html>';
           const injectedHtml = injectEventOgIntoHtml(rawHtml, testEvent);
 
-          expect(injectedHtml).toContain('property="og:url" content="https://kwegatta.ai.studio/e/ev-canonical-test-1101"');
-          expect(injectedHtml).toContain('rel="canonical" href="https://kwegatta.ai.studio/e/ev-canonical-test-1101"');
-          expect(injectedHtml).toContain('property="og:image" content="https://kwegatta.ai.studio/og/event/ev-canonical-test-1101.jpg?v=');
-          expect(injectedHtml).toContain('name="twitter:image" content="https://kwegatta.ai.studio/og/event/ev-canonical-test-1101.jpg?v=');
+          expect(injectedHtml).toContain('property="og:url" content="https://matchpiece.ai.studio/e/ev-canonical-test-1101"');
+          expect(injectedHtml).toContain('rel="canonical" href="https://matchpiece.ai.studio/e/ev-canonical-test-1101"');
+          expect(injectedHtml).toContain('property="og:image" content="https://matchpiece.ai.studio/og/event/ev-canonical-test-1101.jpg?v=');
+          expect(injectedHtml).toContain('name="twitter:image" content="https://matchpiece.ai.studio/og/event/ev-canonical-test-1101.jpg?v=');
           expect(injectedHtml).not.toContain('https://kwegatta-359429599502.us-west1.run.app');
 
           // If PUBLIC_SHARE_URL is provided, it should respect it with trailing slashes stripped
@@ -6293,7 +6293,7 @@ describe('Release 1.5.0 Features', () => {
         }
       });
 
-      it('c) sw.js CACHE_NAME equals "kwegatta-" + package.json version', () => {
+      it('c) sw.js CACHE_NAME equals "matchpiece-" + package.json version', () => {
         const pkgPath = path.join(process.cwd(), 'package.json');
         const swPath = path.join(process.cwd(), 'public', 'sw.js');
 
@@ -6304,13 +6304,13 @@ describe('Release 1.5.0 Features', () => {
         expect(match).not.toBeNull();
         const swCacheName = match![1];
 
-        expect(swCacheName).toBe(`kwegatta-${pkg.version}`);
-        expect(pkg.version).toBe('1.12.0');
-        expect(swCacheName).toBe('kwegatta-1.12.0');
+        expect(swCacheName).toBe(`matchpiece-${pkg.version}`);
+        expect(pkg.version).toBe('1.13.0');
+        expect(swCacheName).toBe('matchpiece-1.13.0');
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {
-        expect(OG_RENDER_VERSION).toBe('3');
+        expect(OG_RENDER_VERSION).toBe('4');
         const hash = computeEventOgVersionHash({ title: 'Test', starts_at: '2026-10-15T00:00:00Z' });
         expect(hash).toBeDefined();
         expect(typeof hash).toBe('string');

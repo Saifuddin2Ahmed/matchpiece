@@ -1,12 +1,12 @@
 # Privacy Policy & Data Handling
 
-**Kwegatta** is committed to open contact, transparency, and data minimization, adhering to the principles of the **Digital Public Goods Standard**. This document details exactly what data is collected, why, where it is stored, who can see it, and how members retain complete sovereignty over their personal information.
+**Matchpiece** is committed to open contact, transparency, and data minimization, adhering to the principles of the **Digital Public Goods Standard**. This document details exactly what data is collected, why, where it is stored, who can see it, and how members retain complete sovereignty over their personal information.
 
 ---
 
 ## 1. Core Contact & Privacy Philosophy
 
-**Open contact is the purpose of Kwegatta.**
+**Open contact is the purpose of Matchpiece.**
 * **Signed-in Members**: Any signed-in member can view another member's WhatsApp number directly on their profile and connect with them in one tap. There is no artificial two-sided approval bottleneck.
 * **Privacy Toggle**: During sign-up, we state clearly: *"Your WhatsApp number will be visible to other members."* Every member has an explicit toggle to hide their number if preferred (default is on / visible).
 * **Anonymous Protection**: Unauthenticated / anonymous visitors never receive WhatsApp numbers, and the public API never returns phone numbers to anonymous callers.
@@ -19,7 +19,7 @@
 
 ## 2. What Data We Collect
 
-When you join Kwegatta, our conversational onboarding assistant collects only what is necessary to pair you with builders and mentors:
+When you join Matchpiece, our conversational onboarding assistant collects only what is necessary to pair you with builders and mentors:
 
 1. **Identity & Bio**:
    * Full name.
@@ -54,7 +54,7 @@ When you join Kwegatta, our conversational onboarding assistant collects only wh
 
 * **Database**: Google Cloud Firestore (with ephemeral session synchronization during local campus hackathon deployments).
 * **AI Model Boundary**: Text is sent to the open-weight model `gemma-4-31b-it` hosted on Google Cloud. The prompt is strictly ephemeral: prompts are processed solely to return the structured profile or match synthesis and are not retained to train foundation models.
-* **No Third-Party Ad Trackers**: Kwegatta has zero advertising SDKs, zero third-party telemetry, and zero tracking cookies.
+* **No Third-Party Ad Trackers**: Matchpiece has zero advertising SDKs, zero third-party telemetry, and zero tracking cookies.
 
 ---
 
@@ -81,7 +81,7 @@ You have the unconditional right to be forgotten:
 
 ## 6. Event Moderation, Reports & Visibility (v1.4.0)
 
-With direct member publishing enabled, Kwegatta balances immediate expression with community safety and privacy:
+With direct member publishing enabled, Matchpiece balances immediate expression with community safety and privacy:
 
 ### Confidential Event Reports
 * **Reporting**: Any signed-in member can report an event if it contains spam, scams, offensive material, or represents a false gathering.
@@ -101,15 +101,15 @@ For community members registering for an event without creating an account:
 * **Data Collected**: Full name (2–80 characters), contact phone/WhatsApp or email address, and explicit agreement checkbox to share details with the host.
 * **Visibility Boundary**: Guest registration details are shared **ONLY** with the specific event host and platform administrators. Guests are never listed by name in public attendee lists, and guest details are never exposed to other members or generic API routes.
 * **30-Day Retention Policy**: Guest registration records are automatically deleted from server storage 30 days after the event ends.
-* **Contact Details Notice**: Guest contact details and host contact details are user-provided and unverified by Kwegatta.
+* **Contact Details Notice**: Guest contact details and host contact details are user-provided and unverified by Matchpiece.
 * **AI Privacy Boundary**: Guest details are never passed to the Gemma AI model and are never used for matchmaking or profile synthesis.
 
 ---
 
 ## 8. Honest Limitations & Current Scope
 
-Because Kwegatta was launched as an open-source initiative for **Hacktoberfest 2026 Hack Day Kampala x MUBS**:
-* **WhatsApp Handover**: When you press Connect, conversation handover takes place externally on WhatsApp (`wa.me`). Messages exchanged on WhatsApp are end-to-end encrypted by WhatsApp and do not pass through Kwegatta servers.
+Because Matchpiece was launched as an open-source initiative for **Hacktoberfest 2026 Hack Day Kampala x MUBS**:
+* **WhatsApp Handover**: When you press Connect, conversation handover takes place externally on WhatsApp (`wa.me`). Messages exchanged on WhatsApp are end-to-end encrypted by WhatsApp and do not pass through Matchpiece servers.
 * **Public Projector Wall**: The live wall (`/wall`) displays aggregate statistics, recent match pairings (names and sparks), and community tags for the audience. No private phone numbers or contact details are ever projected.
 
 ---

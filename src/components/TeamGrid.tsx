@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Github, Linkedin, Globe2, MessageCircle } from 'lucide-react';
 import { TeamMember } from '../types';
 import { getInitials } from '../utils';
+import { BRAND_NAME } from '../lib/brand';
 
 function XLogo() {
   return (
@@ -72,7 +73,7 @@ export const TeamGrid: React.FC<TeamGridProps> = ({ team, loading }) => {
   }
 
   return (
-    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch" aria-label="Kwegatta team">
+    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-stretch" aria-label={`${BRAND_NAME} team`}>
       {team.map(member => {
         const photoUrl = member.photo_url || member.linked_avatar || null;
         const role = member.title ? String(member.title).trim() : '';

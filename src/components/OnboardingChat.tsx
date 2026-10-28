@@ -23,6 +23,7 @@ import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { AuthModal } from './AuthModal';
 import { getSortedCountries, guessCountry, deriveLocation } from '../lib/countries';
 import { INTENT_CHOICES, ROLE_CHOICES, STAGE_CHOICES, toggleChoice } from '../lib/profileChoices';
+import { BRAND_NAME } from '../lib/brand';
 
 interface OnboardingChatProps {
   onCompleted: (profile: Profile) => void;
@@ -340,7 +341,7 @@ export const OnboardingChat: React.FC<OnboardingChatProps> = ({ onCompleted }) =
 
     const defaultBio = (data.offers || data.needs)
       ? `I offer ${data.offers || 'collaboration'}. I am looking for ${data.needs || 'partners'}.`
-      : 'Excited to collaborate and build on Kwegatta.';
+      : `Excited to collaborate and build on ${BRAND_NAME}.`;
 
     const initialTags = Array.from(
       new Set([
@@ -745,7 +746,7 @@ export const OnboardingChat: React.FC<OnboardingChatProps> = ({ onCompleted }) =
                     What brings you here?
                   </h2>
                   <p className="text-xs text-[var(--fg-muted)] mt-1">
-                    Select up to 3 goals that describe what you want to achieve on Kwegatta.
+                    Select up to 3 goals that describe what you want to achieve on {BRAND_NAME}.
                   </p>
                 </div>
 
@@ -1401,7 +1402,7 @@ export const OnboardingChat: React.FC<OnboardingChatProps> = ({ onCompleted }) =
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           onSuccess={handleAuthSuccess}
-          title={authModalPurpose === 'before_save' ? 'Sign in to save your profile' : 'Sign in to Kwegatta'}
+          title={authModalPurpose === 'before_save' ? 'Sign in to save your profile' : `Sign in to ${BRAND_NAME}`}
           subtitle={
             authModalPurpose === 'before_save'
               ? 'Sign in with Google in one tap to save your profile and discover your matches.'

@@ -1,8 +1,8 @@
-# Kwegatta Team
+# Matchpiece Team
 
-Kwegatta was developed and built for **Hacktoberfest 2026 Hack Day Kampala x MUBS** on Friday 2 October 2026 at the Entrepreneurship, Innovation and Incubation Centre (EIIC), Makerere University Business School (MUBS), Kampala, Uganda, winning **1st place · Hacktoberfest 2026 Hack Day Kampala**.
+Matchpiece (then called Kwegatta) was developed and built for **Hacktoberfest 2026 Hack Day Kampala x MUBS** on Friday 2 October 2026 at the Entrepreneurship, Innovation and Incubation Centre (EIIC), Makerere University Business School (MUBS), Kampala, Uganda, winning **1st place · Hacktoberfest 2026 Hack Day Kampala**.
 
-Sixty-seven people took part and eight projects were built. Kwegatta was awarded 1st place, and the team was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
+Sixty-seven people took part and eight projects were built. The Matchpiece team (then Kwegatta) was awarded 1st place and was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
 
 | Name | University | GitHub |
 | ---- | ---------- | ------ |

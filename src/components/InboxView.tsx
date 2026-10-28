@@ -5,6 +5,7 @@ import { formatTimeAgo } from '../utils';
 import { Avatar } from './Avatar';
 import { NotificationModal } from './NotificationModal';
 import { resolveNotificationTarget } from '../lib/notificationTarget';
+import { BRAND_NAME } from '../lib/brand';
 
 interface InboxViewProps {
   notifications: NotificationItem[];
@@ -139,7 +140,7 @@ export const InboxView: React.FC<InboxViewProps> = ({
                   className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)] ${
                     !n.read ? 'bg-[var(--accent-subtle)]/30 font-medium' : 'hover:bg-[var(--subtle)]'
                   }`}
-                  aria-label={`Notification from ${sender?.name || 'Kwegatta'}`}
+                  aria-label={`Notification from ${sender?.name || BRAND_NAME}`}
                 >
                   <div className="mt-0.5 flex-shrink-0">{getIcon(n.type)}</div>
 

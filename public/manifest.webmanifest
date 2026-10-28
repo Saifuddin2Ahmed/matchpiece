@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Kwegatta",
-  "short_name": "Kwegatta",
-  "description": "Network where students and builders match by what they need and offer using the open-weight Gemma 4 model.",
+  "name": "Matchpiece",
+  "short_name": "Matchpiece",
+  "description": "Find your missing piece. Matchpiece (formerly Kwegatta) matches students and builders by what they need and offer using the open-weight Gemma 4 model.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

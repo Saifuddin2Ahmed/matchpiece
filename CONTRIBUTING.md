@@ -1,6 +1,6 @@
-# Contributing to Kwegatta
+# Contributing to Matchpiece
 
-Thank you for your interest in contributing to **Kwegatta**! We are building an open-source student and builder networking platform aligned with the **Digital Public Goods Standard**, first launched at **Hacktoberfest 2026 Hack Day Kampala x Makerere University Business School (MUBS)**.
+Thank you for your interest in contributing to **Matchpiece**! We are building an open-source student and builder networking platform aligned with the **Digital Public Goods Standard**, first launched at **Hacktoberfest 2026 Hack Day Kampala x Makerere University Business School (MUBS)**.
 
 Whether you are fixing a typo, designing a better empty state, improving matchmaking logic, or writing documentation, every contribution helps students find the peers they should build and learn with.
 

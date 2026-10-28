@@ -1,5 +1,5 @@
 {
-  "name": "Kwegatta",
+  "name": "Matchpiece",
   "description": "1st place · Hacktoberfest 2026 Hack Day Kampala. Match with people you should build and learn with based on what you need and offer using the open-weight Gemma 4 model.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

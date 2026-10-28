@@ -3,6 +3,7 @@ import { X, Download, Share2, Sparkles } from 'lucide-react';
 import { Profile } from '../types';
 import { generateQrCodeDataUrl } from '../utils';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { BRAND_NAME, BRAND_SLUG, PRIMARY_HOST, PRIMARY_URL } from '../lib/brand';
 
 interface ShareCardModalProps {
   profile: Profile;
@@ -86,7 +87,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
       const qrX = width - qrSize - 64;
       const qrY = height - qrSize - 64;
 
-      const profileUrl = `https://kwegatta.ai.studio/#/u/${profile.id}`;
+      const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
       const qrData = await generateQrCodeDataUrl(profileUrl, 240);
 
       let qrImg: HTMLImageElement | null = null;
@@ -128,7 +129,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         // Brand Header
         ctx.fillStyle = '#F5B700';
         ctx.font = 'bold 28px "Space Grotesk", sans-serif';
-        ctx.fillText('KWEGATTA', 64, 80);
+        ctx.fillText(BRAND_NAME.toUpperCase(), 64, 80);
 
         ctx.fillStyle = 'rgba(240, 243, 246, 0.6)';
         ctx.font = '16px "Inter", sans-serif';
@@ -227,7 +228,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         // Headline & Bio
         ctx.fillStyle = '#E2E8F0';
         ctx.font = '22px "Inter", sans-serif';
-        const headline = profile.headline || profile.bio || (profile.offers ? `Offers: ${profile.offers}` : 'Collaborator on Kwegatta');
+        const headline = profile.headline || profile.bio || (profile.offers ? `Offers: ${profile.offers}` : `Collaborator on ${BRAND_NAME}`);
         const truncatedHeadline = headline.length > 80 ? headline.slice(0, 77) + '...' : headline;
         ctx.fillText(truncatedHeadline, 64, 340);
 
@@ -284,7 +285,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         // Footer notice
         ctx.fillStyle = 'rgba(240, 243, 246, 0.4)';
         ctx.font = '13px "Inter", sans-serif';
-        ctx.fillText('kwegatta.ai.studio · Kampala, Uganda · 1st place · Hacktoberfest 2026 Hack Day Kampala', 64, height - 48);
+        ctx.fillText(`${PRIMARY_HOST} · Kampala, Uganda · 1st place · Hacktoberfest 2026 Hack Day Kampala`, 64, height - 48);
       };
 
       drawCard(true);
@@ -319,7 +320,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
     if (!dataUrl) return;
     const a = document.createElement('a');
     a.href = dataUrl;
-    a.download = `kwegatta-${profile.name.toLowerCase().replace(/\s+/g, '-')}-card.png`;
+    a.download = `${BRAND_SLUG}-${profile.name.toLowerCase().replace(/\s+/g, '-')}-card.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -327,12 +328,12 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
   };
 
   const handleShare = async () => {
-    const profileUrl = `https://kwegatta.ai.studio/#/u/${profile.id}`;
+    const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${profile.name} on Kwegatta`,
-          text: `Check out ${profile.name}'s collaboration profile on Kwegatta: ${profile.headline || profile.role}`,
+          title: `${profile.name} on ${BRAND_NAME}`,
+          text: `Check out ${profile.name}'s collaboration profile on ${BRAND_NAME}: ${profile.headline || profile.role}`,
           url: profileUrl
         });
         onToast('Shared profile successfully!');

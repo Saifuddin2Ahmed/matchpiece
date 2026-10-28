@@ -1,6 +1,6 @@
 # Data Model & Schemas
 
-This document defines the data structures and storage schemas used in **Kwegatta**, conforming to Cloud Firestore standards and the **Digital Public Goods Standard** for data minimization and privacy.
+This document defines the data structures and storage schemas used in **Matchpiece**, conforming to Cloud Firestore standards and the **Digital Public Goods Standard** for data minimization and privacy.
 
 ---
 

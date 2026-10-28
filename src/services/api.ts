@@ -8,8 +8,8 @@ import { Profile, MatchResult, LearnMatchResult, Post, NotificationItem, Follow,
 export const GEMMA_MODEL_ID = 'gemma-4-26b-a4b-it';
 export const GEMMA_ALT_MODEL_ID = 'gemma-4-31b-it';
 
-export const APP_NAME = 'Kwegatta';
-export const PUBLIC_APP_URL = 'https://kwegatta.ai.studio';
+export const APP_NAME = BRAND_NAME;
+export const PUBLIC_APP_URL = PRIMARY_URL;
 
 const STOP_WORDS = new Set(
   'the and for with that this from have need needs want looking who can are you your our some any into about more help someone person people good new also just like make made building build work working'.split(' ')
@@ -485,7 +485,7 @@ Return ONLY this JSON, no other text:
     ).slice(0, 5);
 
     return {
-      headline: data.offers?.slice(0, 60) || 'Kwegatta member',
+      headline: data.offers?.slice(0, 60) || `${APP_NAME} member`,
       bio: `I offer ${data.offers || 'my skills'}. I am looking for ${data.needs || 'collaborators'}.`,
       tags,
       skills: tags,
@@ -806,6 +806,7 @@ export async function fetchGitHubData(input: string): Promise<GitHubData | null>
 }
 
 import { getCurrentIdToken } from './firebase';
+import { BRAND_NAME, PRIMARY_URL } from '../lib/brand';
 
 export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -926,7 +927,7 @@ export async function exportMemberData(profile: Profile): Promise<string> {
   ]);
   const userMatches = matches.filter(m => m.a_id === profile.id || m.b_id === profile.id);
   const bundle = {
-    project: 'Kwegatta',
+    project: APP_NAME,
     standard_alignment: 'Digital Public Goods Standard',
     exported_at: new Date().toISOString(),
     profile,

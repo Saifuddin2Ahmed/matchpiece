@@ -236,11 +236,11 @@ describe('About page layout', () => {
     expect(scroll).toHaveBeenCalled();
   });
 
-  it('keeps the name-origin text, drops numbered labels and the full licence text', async () => {
+  it('shows the award line instead of the name-origin text, drops numbered labels and the full licence text', async () => {
     const { container } = await renderAbout();
     const text = container.textContent || '';
-    expect(text).toContain('Kwegatta comes from the Luganda word okwegatta, meaning to unite or come together.');
-    expect(text).toContain('Okwegatta ge maanyi — unity is strength.');
+    expect(text).toContain('Matchpiece (formerly Kwegatta) won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS.');
+    expect(text).not.toMatch(/okwegatta|maanyi/i);
     expect(text).not.toMatch(/\b0\d \//);
     expect(text).not.toContain('Permission is hereby granted');
     expect(screen.getByRole('link', { name: /Read the licence/ }).getAttribute('href')).toContain('/LICENSE');

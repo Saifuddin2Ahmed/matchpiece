@@ -1,14 +1,14 @@
 # Digital Public Goods Standard Alignment
 
-**Kwegatta** is designed and maintained to be **aligned with** the [Digital Public Goods Standard](https://digitalpublicgoods.net/standard/). 
+**Matchpiece** is designed and maintained to be **aligned with** the [Digital Public Goods Standard](https://digitalpublicgoods.net/standard/). 
 
-> **Important Notice**: Kwegatta is an independent open-source project and is described here as being **aligned with** the Digital Public Goods Standard. It is not "certified" or "endorsed by the United Nations" or the DPGA.
+> **Important Notice**: Matchpiece is an independent open-source project and is described here as being **aligned with** the Digital Public Goods Standard. It is not "certified" or "endorsed by the United Nations" or the DPGA.
 
 ---
 
 ## 1. Relevance to the Sustainable Development Goals (SDGs)
 
-Kwegatta directly addresses four United Nations Sustainable Development Goals:
+Matchpiece directly addresses four United Nations Sustainable Development Goals:
 
 * **SDG 4: Quality Education (Target 4.4)**:
   * Facilitates peer-to-peer mentoring and collaborative learning.
@@ -24,7 +24,7 @@ Kwegatta directly addresses four United Nations Sustainable Development Goals:
 
 ## 2. Assessment Against the 9 DPG Standard Indicators
 
-| # | DPG Indicator | Alignment Status | How Kwegatta Meets This Indicator / Current Gaps |
+| # | DPG Indicator | Alignment Status | How Matchpiece Meets This Indicator / Current Gaps |
 | - | ------------- | ---------------- | ------------------------------------------------ |
 | **1** | **Relevance to Sustainable Development Goals** | **Met** | Directly targets **SDG 4** (peer learning), **SDG 8** (student ventures), **SDG 9** (open innovation), and **SDG 17** (cross-campus partnerships) as detailed above. |
 | **2** | **Use of an Approved Open Source Licence** | **Met** | Licensed under the OSI-approved **MIT License** ([LICENSE](../LICENSE)). AI foundation model utilizes the open-weight **Apache 2.0** licensed Gemma 4 architecture. |
@@ -40,7 +40,7 @@ Kwegatta directly addresses four United Nations Sustainable Development Goals:
 
 ## 3. Continuous Improvement Plan
 
-To further deepen alignment with the standard, the Kwegatta team is working toward:
+To further deepen alignment with the standard, the Matchpiece team is working toward:
 1. Adding automated end-to-end accessibility testing (WCAG 2.1 AA audits).
 2. Implementing native multi-language localization (Luganda, Swahili, French) to expand access across East Africa.
 3. Enabling decentralized cryptographic profile verification via open decentralized identity (DID) standards.

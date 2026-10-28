@@ -6,6 +6,7 @@ import { formatWhatsAppUrl } from '../utils';
 import { Avatar } from './Avatar';
 import { PageHeader } from './PageHeader';
 import { HEADER_IMAGES } from '../lib/headerImages';
+import { BRAND_NAME } from '../lib/brand';
 
 interface LearnViewProps {
   currentProfile: Profile | null;
@@ -123,7 +124,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
                   Find your personal mentor &amp; study partner
                 </h3>
                 <p className="text-xs sm:text-sm text-[var(--fg-muted)] leading-relaxed">
-                  Join Kwegatta in about 2 minutes. Our open-weight Gemma 4 model matches you with one peer who teaches what you want to learn, and one study buddy sharing your exact goal.
+                  Join {BRAND_NAME} in about 2 minutes. Our open-weight Gemma 4 model matches you with one peer who teaches what you want to learn, and one study buddy sharing your exact goal.
                 </p>
               </div>
             </div>

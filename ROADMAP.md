@@ -1,6 +1,6 @@
 # Product Roadmap
 
-This roadmap outlines the milestones for **Kwegatta**, from its debut at **Hacktoberfest 2026 Hack Day Kampala x Makerere University Business School (MUBS)** to a multi-campus peer-learning network across East Africa.
+This roadmap outlines the milestones for **Matchpiece**, from its debut at **Hacktoberfest 2026 Hack Day Kampala x Makerere University Business School (MUBS)** to a multi-campus peer-learning network across East Africa.
 
 ---
 
@@ -52,4 +52,4 @@ This roadmap outlines the milestones for **Kwegatta**, from its debut at **Hackt
 - [ ] **Local LLM Edge Execution**:
   - Explore on-device quantized Gemma 4 execution in the browser via WebGPU to run matchmaking completely client-side without internet.
 - [ ] **Micro-Grant Collaboration Pools**:
-  - Integration with open student builder grants to award prototype funding to the top complementary pairs formed on Kwegatta.
+  - Integration with open student builder grants to award prototype funding to the top complementary pairs formed on Matchpiece.

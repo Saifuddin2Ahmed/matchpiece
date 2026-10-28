@@ -1,4 +1,5 @@
 import React from 'react';
+import { BRAND_NAME } from '../lib/brand';
 
 interface BrandLogoProps {
   size?: 'sm' | 'md' | 'lg' | number;
@@ -15,10 +16,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
   return (
     <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Official Kwegatta Mark */}
+      {/* Brand mark (file name kept from the old name) */}
       <img
         src="/kwegatta-mark.svg"
-        alt="Kwegatta Mark"
+        alt={`${BRAND_NAME} mark`}
         width={pixelSize}
         height={pixelSize}
         className="flex-shrink-0 object-contain"
@@ -27,7 +28,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
       {showText && (
         <span className="font-display font-bold tracking-tight text-base sm:text-lg text-[var(--fg)]">
-          Kwegatta
+          {BRAND_NAME}
         </span>
       )}
     </div>

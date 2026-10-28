@@ -18,6 +18,7 @@ import { matchCandidatesWithGemma, calculateKeywordMatches, db, APP_NAME, reques
 import { formatWhatsAppUrl, generateQrCodeDataUrl } from '../utils';
 import { MatchOverlapAvatars } from './MatchOverlapAvatars';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { BRAND_NAME, PRIMARY_URL } from '../lib/brand';
 
 interface MatchesViewProps {
   currentProfile: Profile;
@@ -50,7 +51,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
   const [copiedInvite, setCopiedInvite] = useState(false);
   const inviteDialogRef = useDialogA11y<HTMLDivElement>(showInviteModal, () => setShowInviteModal(false));
 
-  const inviteUrl = `https://kwegatta.ai.studio/#/u/${currentProfile.id}`;
+  const inviteUrl = `${PRIMARY_URL}/#/u/${currentProfile.id}`;
 
   useEffect(() => {
     generateQrCodeDataUrl(inviteUrl, 200).then(setInviteQrDataUrl).catch(() => {});
@@ -288,7 +289,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
           <div className="space-y-2 max-w-md mx-auto">
             <h3 className="font-bold text-base text-[var(--fg)]">Few members yet · Pioneer cohort</h3>
             <p className="text-xs text-[var(--fg-muted)] leading-relaxed">
-              You are among the first to join Kwegatta! As classmates and builders join with their skills and project needs, Gemma 4 will automatically surface your top collaborative matches here.
+              You are among the first to join {BRAND_NAME}! As classmates and builders join with their skills and project needs, Gemma 4 will automatically surface your top collaborative matches here.
             </p>
           </div>
 
@@ -341,7 +342,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
                 className="kw-card p-6 max-w-sm w-full space-y-4 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl text-center shadow-2xl outline-none"
               >
                 <div className="flex items-center justify-between">
-                  <h4 id="invite-dialog-title" className="font-bold text-sm text-[var(--fg)]">Invite people to Kwegatta</h4>
+                  <h4 id="invite-dialog-title" className="font-bold text-sm text-[var(--fg)]">Invite people to {BRAND_NAME}</h4>
                   <button onClick={() => setShowInviteModal(false)} aria-label="Close" className="text-[var(--fg-subtle)] hover:text-[var(--fg)] p-1">
                     ✕
                   </button>

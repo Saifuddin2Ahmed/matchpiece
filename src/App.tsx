@@ -27,6 +27,7 @@ import {
 } from './utils';
 import { auth, handleRedirectResult, logOut } from './services/firebase';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
+import { BRAND_NAME } from './lib/brand';
 
 const AdminView = React.lazy(() => import('./components/AdminView').then(m => ({ default: m.AdminView })));
 const WallView = React.lazy(() => import('./components/WallView').then(m => ({ default: m.WallView })));
@@ -352,7 +353,7 @@ export default function App() {
   // Follow / Unfollow
   const handleToggleFollow = async (targetId: string) => {
     if (!currentProfile) {
-      showToast('Join Kwegatta to follow other people');
+      showToast(`Join ${BRAND_NAME} to follow other people`);
       triggerJoinFlow();
       return;
     }
@@ -774,7 +775,7 @@ export default function App() {
           isOpen={showSignInModal}
           onClose={() => setShowSignInModal(false)}
           onSuccess={handleGlobalSignInSuccess}
-          title="Sign in to Kwegatta"
+          title={`Sign in to ${BRAND_NAME}`}
           subtitle="Sign in with Google in one tap to access your profile, matches, and chats from any device."
           existingProfile={currentProfile}
         />

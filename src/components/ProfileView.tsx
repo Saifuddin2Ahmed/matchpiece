@@ -48,6 +48,7 @@ import { SocialLinksRow } from './SocialLinksRow';
 import { getSortedCountries, deriveLocation } from '../lib/countries';
 import { ROLE_CHOICES, STAGE_CHOICES, INTENT_CHOICES, parseIntents, toggleChoice, makeFirst } from '../lib/profileChoices';
 import { auth, addPasswordToAccount, validatePasswordStrength, formatAuthError } from '../services/firebase';
+import { BRAND_NAME, BRAND_SLUG, PRIMARY_URL } from '../lib/brand';
 
 const ShareCardModal = React.lazy(() => import('./ShareCardModal').then(m => ({ default: m.ShareCardModal })));
 
@@ -229,7 +230,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const userEmail = currentUser?.email || profile.email || 'your account';
 
   useEffect(() => {
-    const profileUrl = `https://kwegatta.ai.studio/#/u/${profile.id}`;
+    const profileUrl = `${PRIMARY_URL}/#/u/${profile.id}`;
     generateQrCodeDataUrl(profileUrl, 240).then(setQrCodeDataUrl);
   }, [profile.id]);
 
@@ -464,7 +465,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   };
 
   const handleShareLink = () => {
-    const url = `https://kwegatta.ai.studio/#/u/${profile.id}`;
+    const url = `${PRIMARY_URL}/#/u/${profile.id}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       onToast('Profile link copied to clipboard');
@@ -479,7 +480,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `kwegatta-${profile.github || profile.name.toLowerCase().replace(/\s+/g, '-')}-data.json`;
+      a.download = `${BRAND_SLUG}-${profile.github || profile.name.toLowerCase().replace(/\s+/g, '-')}-data.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -524,7 +525,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
     try {
       setIsConnecting(true);
-      const text = `Hi ${profile.name.split(' ')[0]}, I'm ${currentProfile.name} on Kwegatta. Let's connect!`;
+      const text = `Hi ${profile.name.split(' ')[0]}, I'm ${currentProfile.name} on ${BRAND_NAME}. Let's connect!`;
 
       await db.insert('notifications', {
         to_id: profile.id,
@@ -634,7 +635,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
 
             <p className="text-xs text-[var(--fg)] leading-relaxed">
-              This action <strong>cannot be undone</strong>. All your personal data, matches, posts, notifications, and following connections will be permanently wiped from the Kwegatta database in compliance with the Digital Public Goods Standard.
+              This action <strong>cannot be undone</strong>. All your personal data, matches, posts, notifications, and following connections will be permanently wiped from the {BRAND_NAME} database in compliance with the Digital Public Goods Standard.
             </p>
 
             <div className="space-y-1.5 text-xs bg-[var(--subtle)] p-3 rounded-md border border-[var(--border)]">

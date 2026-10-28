@@ -27,6 +27,7 @@ import {
 } from '../services/api';
 import { TEAM_LIMITS, TEAM_PHOTO_MAX_BYTES, TEAM_PHOTO_TYPES, validateTeamPayload } from '../lib/teamFields';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { BRAND_NAME } from '../lib/brand';
 
 type TeamForm = {
   name: string;
@@ -618,7 +619,7 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ team, detailsEnabled, 
               </div>
 
               <div className="space-y-1.5">
-                <label htmlFor="team-link-search" className="block text-xs font-semibold text-[var(--fg)]">Linked Kwegatta profile</label>
+                <label htmlFor="team-link-search" className="block text-xs font-semibold text-[var(--fg)]">Linked {BRAND_NAME} profile</label>
                 {form.linked_profile_id ? (
                   <div className="flex items-center justify-between gap-2 p-2 rounded-lg border border-[var(--card-border)] bg-[var(--bg-subtle)]">
                     <span className="flex items-center gap-1.5 min-w-0 text-xs">

@@ -2,7 +2,7 @@
   "entities": {
     "Profile": {
       "title": "Profile",
-      "description": "User profile in Kwegatta network",
+      "description": "User profile in Matchpiece network",
       "type": "object",
       "properties": {
         "id": { "type": "string" },

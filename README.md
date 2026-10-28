@@ -1,4 +1,6 @@
-# Kwegatta 🤝
+# Matchpiece 🤝
+
+*Find your missing piece.* Formerly **Kwegatta**.
 
 [![CI](https://github.com/Saifuddin2Ahmed/kwegatta/actions/workflows/ci.yml/badge.svg)](https://github.com/Saifuddin2Ahmed/kwegatta/actions/workflows/ci.yml)
 [![Hacktoberfest 2026](https://img.shields.io/badge/Hacktoberfest-2026-ff7a00.svg?style=flat-square&logo=hacktoberfest)](https://hacktoberfest.com/)
@@ -10,10 +12,11 @@
 [![Digital Public Goods](https://img.shields.io/badge/DPG-Aligned-success.svg?style=flat-square)](./docs/DPG-ALIGNMENT.md)
 [![Design: GitHub Primer](https://img.shields.io/badge/Design-GitHub_Primer-21262d.svg?style=flat-square&logo=github)](https://primer.style/)
 
-> **"Find the people you should build and learn with."**  
-> Kwegatta comes from the Luganda word okwegatta, meaning to unite or come together. As the saying goes, Okwegatta ge maanyi: unity is strength. Built for **Hacktoberfest 2026 Hack Day Kampala x MUBS** (Makerere University Business School) where it was awarded **1st place · Hacktoberfest 2026 Hack Day Kampala**. Sixty-seven people took part and eight projects were built. Kwegatta was awarded 1st place, and the team was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
+> **"Find your missing piece."**  
+> Matchpiece (formerly Kwegatta) won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS. It was built for **Hacktoberfest 2026 Hack Day Kampala x MUBS** (Makerere University Business School) where it was awarded **1st place · Hacktoberfest 2026 Hack Day Kampala**. Sixty-seven people took part and eight projects were built. The Matchpiece team (then Kwegatta) was awarded 1st place and was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
 
-* **Live Application**: [https://kwegatta.ai.studio](https://kwegatta.ai.studio)
+* **Live Application**: [https://matchpiece.ai.studio](https://matchpiece.ai.studio)
+* **Old address**: [https://kwegatta.ai.studio](https://kwegatta.ai.studio) redirects page visits to the new address.
 * **GitHub Repository**: [https://github.com/Saifuddin2Ahmed/kwegatta](https://github.com/Saifuddin2Ahmed/kwegatta)
 * **Digital Public Goods Standard**: Designed and documented to be **aligned with** the Digital Public Goods Standard ([docs/DPG-ALIGNMENT.md](docs/DPG-ALIGNMENT.md)).
 
@@ -53,7 +56,7 @@ Traditional networking fails because:
 
 ## The Solution & Goals
 
-**Kwegatta** turns room networking into a seamless experience:
+**Matchpiece** turns room networking into a seamless experience:
 1. **Chat Onboarding on Mobile**: A quick conversation gathers the member's name, public GitHub, what they offer, what they need, what they teach, and what they want to learn.
 2. **AI Synthesized Profiles**: The open-weight model **Gemma 4** (`gemma-4-26b-a4b-it` default, `gemma-4-31b-it` alternative) synthesizes a punchy headline, 2-sentence bio, skills, and role using strictly member-supplied facts.
 3. **Complementary Matchmaking**: AI evaluates need-and-offer coverage rather than mere surface similarity (e.g., matching a business student who needs mobile developers with a Flutter developer who needs sales and marketing).
@@ -70,25 +73,25 @@ Traditional networking fails because:
 * **Hosts**: Web3 Club MUBS and GDG on Campus MUBS
 * **Organizers**: Hacktoberfest 2026 is powered by **Major League Hacking (MLH)** and **DEV**, presented by **DigitalOcean**. Theme: *"AI belongs to everyone"*.
 * **Challenge Entered**: **Best Open-Source AI Project** ([https://www.mlh.com/opensource-ai](https://www.mlh.com/opensource-ai))
-* **Result**: **1st place · Hacktoberfest 2026 Hack Day Kampala**. Sixty-seven people took part and eight projects were built. Kwegatta was awarded 1st place, and the team was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
+* **Result**: **1st place · Hacktoberfest 2026 Hack Day Kampala**. Sixty-seven people took part and eight projects were built. The Matchpiece team (then Kwegatta) was awarded 1st place and was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
 * **Designated Models**: **`gemma-4-26b-a4b-it`** (default; benchmarked at 732ms avg TTFT) and **`gemma-4-31b-it`** (alternative), both Google DeepMind Apache 2.0 open-weight models qualifying under challenge rules.
 
 ---
 
 ## How We Meet the Challenge Requirements
 
-| Challenge Requirement | How Kwegatta Meets the Requirement |
+| Challenge Requirement | How Matchpiece Meets the Requirement |
 | --------------------- | ---------------------------------- |
-| **a) Open-source or open-weight AI is an important part of the project** | **MET**: Every AI feature in Kwegatta (profile synthesis, complementary matchmaking, post classification, and learning recommendations) runs exclusively on open-weight Gemma 4 models (`gemma-4-26b-a4b-it` as default, `gemma-4-31b-it` as alternative). No closed or proprietary models are used. |
+| **a) Open-source or open-weight AI is an important part of the project** | **MET**: Every AI feature in Matchpiece (profile synthesis, complementary matchmaking, post classification, and learning recommendations) runs exclusively on open-weight Gemma 4 models (`gemma-4-26b-a4b-it` as default, `gemma-4-31b-it` as alternative). No closed or proprietary models are used. |
 | **b) Public GitHub repository with an open-source licence** | **MET**: Public repository at [https://github.com/Saifuddin2Ahmed/kwegatta](https://github.com/Saifuddin2Ahmed/kwegatta) under the OSI-approved **MIT License** (`LICENSE`). |
-| **c) README explains what we built, how to run or try it, names the model and key dependencies, with a link to the model's licence** | **MET**: This README explains Kwegatta in detail, provides local run instructions, lists dependencies, and links to the [Apache 2.0 license for Gemma 4](https://ai.google.dev/gemma/docs/core). |
-| **d) A working demo and a clear explanation** | **MET**: Live deployed app running at [https://kwegatta.ai.studio](https://kwegatta.ai.studio) with a step-by-step walkthrough in [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md). |
+| **c) README explains what we built, how to run or try it, names the model and key dependencies, with a link to the model's licence** | **MET**: This README explains Matchpiece in detail, provides local run instructions, lists dependencies, and links to the [Apache 2.0 license for Gemma 4](https://ai.google.dev/gemma/docs/core). |
+| **d) A working demo and a clear explanation** | **MET**: Live deployed app running at [https://matchpiece.ai.studio](https://matchpiece.ai.studio) with a step-by-step walkthrough in [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md). |
 
 ---
 
 ## Team
 
-The team behind Kwegatta:
+The team behind Matchpiece:
 
 | Name | University | GitHub |
 | ---- | ---------- | ------ |
@@ -161,12 +164,12 @@ Detailed architectural documentation is available in [docs/ARCHITECTURE.md](docs
 
 ## Open-Weight AI Model (Gemma 4: gemma-4-26b-a4b-it / gemma-4-31b-it)
 
-Kwegatta enforces a strict architectural policy:
+Matchpiece enforces a strict architectural policy:
 1. **Model**: Exclusively uses open-weight foundation models published by Google DeepMind under the [Apache 2.0 License](https://ai.google.dev/gemma/docs/core): **`gemma-4-26b-a4b-it`** (default production model, benchmarked at 732ms average TTFT) and **`gemma-4-31b-it`** (designated high-capacity alternative).
 2. **Zero Closed Models**: Closed proprietary models (Gemini, GPT, Claude) are strictly banned to maintain open-source software sovereignty.
 3. **Server-Side Execution**: The API key is stored and executed exclusively on the server (`server.ts`). No credentials ever appear in client bundles.
 4. **Anti-Hallucination Guardrails**: Prompts explicitly forbid inventing skills, universities, or achievements. Only facts provided by members are used.
-5. **Deterministic Heuristic Fallback**: If the model times out (> 90s) or fails, Kwegatta seamlessly activates its keyword complement ranking, transparently labeled `Basic match (AI unavailable)`.
+5. **Deterministic Heuristic Fallback**: If the model times out (> 90s) or fails, Matchpiece seamlessly activates its keyword complement ranking, transparently labeled `Basic match (AI unavailable)`.
 
 Full prompt specifications, benchmarks, and safety boundaries are documented in [docs/AI-USAGE.md](docs/AI-USAGE.md).
 
@@ -241,7 +244,7 @@ npm run build
 
 ## Deployment (Google Cloud Run)
 
-To deploy Kwegatta to Google Cloud Run:
+To deploy Matchpiece to Google Cloud Run:
 
 ```bash
 gcloud run deploy kwegatta \
@@ -250,6 +253,8 @@ gcloud run deploy kwegatta \
   --allow-unauthenticated \
   --set-env-vars GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 ```
+
+The hosted app runs the same release on two Cloud Run services: `kwegatta-1` serves https://matchpiece.ai.studio, and `kwegatta` serves the old address https://kwegatta.ai.studio. On the old service, `LEGACY_HOSTS=kwegatta.ai.studio` and `PRIMARY_URL=https://matchpiece.ai.studio` send page visits to the new address with a 301 that keeps the path and query. API calls, `sw.js`, the manifest, OG images and static files are still served there, so open tabs and installed apps keep working until they reload.
 
 For serverless cloud function proxying, refer to the self-contained package in `/proxy`.
 

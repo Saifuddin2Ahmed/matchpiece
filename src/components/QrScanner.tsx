@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RefreshCw, CameraOff, SwitchCamera } from 'lucide-react';
+import { PRIMARY_HOST } from '../lib/brand';
 
 export type ScanFeedbackOutcome = 'ok' | 'already' | 'retry';
 
@@ -410,7 +411,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ onDetect, paused = false }
           <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
             <CameraOff className="w-7 h-7 text-rose-400" />
             <p className="text-xs text-[var(--fg)] leading-relaxed">
-              Camera access is blocked. Allow camera for kwegatta.ai.studio in your browser settings, then tap Try again.
+              Camera access is blocked. Allow camera for {PRIMARY_HOST} in your browser settings, then tap Try again.
             </p>
             <button
               type="button"

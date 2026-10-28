@@ -1,6 +1,6 @@
 # AI Usage & Governance
 
-This document outlines how artificial intelligence is implemented within **Kwegatta**, the exact models and benchmarks evaluated, the prompts utilized, our safety guardrails, anti-hallucination principles, human-in-the-loop review, and graceful fallback behaviors.
+This document outlines how artificial intelligence is implemented within **Matchpiece**, the exact models and benchmarks evaluated, the prompts utilized, our safety guardrails, anti-hallucination principles, human-in-the-loop review, and graceful fallback behaviors.
 
 ---
 
@@ -9,7 +9,7 @@ This document outlines how artificial intelligence is implemented within **Kwega
 ### A. Model Policy
 * **Default Production Model**: **`gemma-4-26b-a4b-it`** (Google DeepMind, Apache 2.0 license).
 * **Designated Alternative**: **`gemma-4-31b-it`** (Google DeepMind, Apache 2.0 license).
-* **Zero Proprietary APIs**: Closed or proprietary commercial models (such as Gemini Pro, GPT-4, or Claude) are strictly banned. Kwegatta runs 100% on open-weight models to ensure technological sovereignty, local replicability, and compliance with the MLH Open Source AI track rules.
+* **Zero Proprietary APIs**: Closed or proprietary commercial models (such as Gemini Pro, GPT-4, or Claude) are strictly banned. Matchpiece runs 100% on open-weight models to ensure technological sovereignty, local replicability, and compliance with the MLH Open Source AI track rules.
 
 ### B. Live Benchmark Comparison
 
@@ -17,7 +17,7 @@ The two candidate models were benchmarked in production conditions using real me
 
 | Metric / Attribute | `gemma-4-26b-a4b-it` (Default) | `gemma-4-31b-it` (Alternative) | Operational Advantage |
 | :--- | :--- | :--- | :--- |
-| **Status in Kwegatta** | **Default Production Model** | **Alternative / Fallback** | Primary model for all user traffic |
+| **Status in Matchpiece** | **Default Production Model** | **Alternative / Fallback** | Primary model for all user traffic |
 | **Model Architecture** | 26B parameters (a4b architecture) | 31B parameters (dense) | Optimized memory & latency footprint |
 | **Licence** | Apache 2.0 (Open Weights) | Apache 2.0 (Open Weights) | 100% Open-source compliant |
 | **Success Rate (10 sample calls)** | **10 / 10 (100%)** | 6 / 10 (60%) | 0% failure rate on 26b |
@@ -35,7 +35,7 @@ The two candidate models were benchmarked in production conditions using real me
 ## 2. Core Principles & Hard Constraints
 
 1. **Exclusively Open-Weight Foundation Models**:
-   * Every AI capability inside Kwegatta invokes strictly and solely Google DeepMind's open-weight Gemma 4 family (`gemma-4-26b-a4b-it` default, `gemma-4-31b-it` alternative) under Apache 2.0.
+   * Every AI capability inside Matchpiece invokes strictly and solely Google DeepMind's open-weight Gemma 4 family (`gemma-4-26b-a4b-it` default, `gemma-4-31b-it` alternative) under Apache 2.0.
    * Proprietary or closed-source models are strictly banned to ensure technological sovereignty, auditability, and reproducibility.
 
 2. **Zero Hallucination / Fact Grounding**:
@@ -52,12 +52,12 @@ The two candidate models were benchmarked in production conditions using real me
 
 ---
 
-## 2. Exact Prompts Used in Kwegatta
+## 2. Exact Prompts Used in Matchpiece
 
 ### A. Profile Synthesis (`buildProfileWithGemma`)
 
 ```text
-You write professional, concise member profiles for Kwegatta, a student and builder network at Hacktoberfest Hack Day Kampala x MUBS.
+You write professional, concise member profiles for Matchpiece, a student and builder network at Hacktoberfest Hack Day Kampala x MUBS.
 CRITICAL RULES:
 - Use ONLY the facts provided in INPUT.
 - NEVER invent skills, employers, degrees, universities, awards or achievements not explicitly stated.
@@ -85,7 +85,7 @@ OUTPUT FORMAT: Return strictly a single valid JSON object without markdown or fo
 ### B. Complementary Match Ranking (`rankMatchesWithGemma`)
 
 ```text
-You are the matchmaking engine for Kwegatta at Hack Day Kampala x MUBS.
+You are the matchmaking engine for Matchpiece at Hack Day Kampala x MUBS.
 Find the best complementary partners for the person described in ME from the list of CANDIDATES.
 
 CORE RULE:
@@ -118,7 +118,7 @@ Select the TOP 3 candidates. Return strictly valid JSON array of 3 objects:
 ### C. Feed Post Classification & Auto-Tagging (`classifyPostWithGemma`)
 
 ```text
-Analyze this short community post for Kwegatta (Hack Day Kampala x MUBS).
+Analyze this short community post for Matchpiece (Hack Day Kampala x MUBS).
 Post content: "{body}"
 
 Return strictly valid JSON:

@@ -20,6 +20,7 @@ import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
 import { HEADER_IMAGES } from '../lib/headerImages';
 import { TeamGrid } from './TeamGrid';
+import { BRAND_NAME, BRAND_FORMERLY, AWARD_LINE } from '../lib/brand';
 
 interface AboutViewProps {
   onNavigateHome: () => void;
@@ -129,7 +130,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
               Find the people you should build and learn with.
             </h1>
             <p className="max-w-2xl text-base sm:text-xl text-white/90 leading-relaxed text-balance">
-              Kwegatta matches students and builders by what they need and what they offer.
+              {BRAND_NAME} matches students and builders by what they need and what they offer.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
@@ -151,7 +152,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
         </section>
 
         <p className="max-w-3xl text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed text-balance">
-          Kwegatta comes from the Luganda word <strong className="text-[var(--fg)] font-semibold">okwegatta</strong>, meaning to unite or come together. In East Africa, we say: <span className="text-[var(--fg)] font-medium">Okwegatta ge maanyi</span> — unity is strength.
+          {AWARD_LINE}
         </p>
       </div>
 
@@ -172,7 +173,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
             Match needs with offers.
           </h2>
           <p className="text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed">
-            Kwegatta pairs people where one person's offer meets the other's need, not people with the same keywords. You get a short list of people worth meeting and a message ready to send.
+            {BRAND_NAME} pairs people where one person's offer meets the other's need, not people with the same keywords. You get a short list of people worth meeting and a message ready to send.
           </p>
         </div>
       </section>
@@ -182,7 +183,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
         <div className="space-y-2 max-w-2xl">
           <Eyebrow>The team</Eyebrow>
           <h2 id="team-title" className="text-2xl sm:text-4xl font-display font-bold text-[var(--fg)] tracking-tight">
-            The people behind Kwegatta
+            The people behind {BRAND_NAME}
           </h2>
           <p className="text-sm sm:text-base text-[var(--fg-muted)]">
             Built at Hack Day Kampala × MUBS.
@@ -195,7 +196,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
               src={photos.hero}
               srcSet={hackDaySrcSet(photos.hero)}
               sizes="(min-width: 1200px) 570px, 50vw"
-              alt="The Kwegatta team coding together at their table during Hack Day Kampala"
+              alt={`The ${BRAND_NAME} team (then ${BRAND_FORMERLY}) coding together at their table during Hack Day Kampala`}
               loading="lazy"
               decoding="async"
               width={800}
@@ -313,7 +314,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
               src={photos.team}
               srcSet={hackDaySrcSet(photos.team)}
               sizes="(min-width: 1024px) 576px, 100vw"
-              alt="Kwegatta team members working on code and design at Hack Day Kampala"
+              alt={`The ${BRAND_NAME} team (then ${BRAND_FORMERLY}) working on code and design at Hack Day Kampala`}
               loading="lazy"
               decoding="async"
               width={800}
@@ -330,7 +331,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
               1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS
             </h2>
             <p className="text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed">
-              Kwegatta entered the Best Open-Source AI Project challenge at Makerere University Business School and was awarded 1st place. Sixty-seven people took part and eight projects were built.
+              The {BRAND_NAME} team (then {BRAND_FORMERLY}) entered the Best Open-Source AI Project challenge at Makerere University Business School and was awarded 1st place. Sixty-seven people took part and eight projects were built.
             </p>
             <p className="text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed">
               The team was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
@@ -363,7 +364,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
 
         <div id="license" className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--card-border)] scroll-mt-24">
           <p className="text-sm text-[var(--fg-muted)]">
-            Kwegatta is free, open-source software under the MIT licence.{' '}
+            {BRAND_NAME} is free, open-source software under the MIT licence.{' '}
             <a
               href="https://github.com/Saifuddin2Ahmed/kwegatta/blob/main/LICENSE"
               target="_blank"
@@ -393,7 +394,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
           </summary>
           <div className="px-5 sm:px-6 pb-6 space-y-4 text-sm text-[var(--fg-muted)] leading-relaxed">
             <p>
-              Kwegatta uses only open-weight models from Google DeepMind. <strong className="text-[var(--fg)]">gemma-4-26b-a4b-it</strong> is the default model for profile summaries and matching, and <strong className="text-[var(--fg)]">gemma-4-31b-it</strong> is the larger alternative. Closed proprietary APIs are not used, so the system stays auditable with no vendor lock-in.
+              {BRAND_NAME} uses only open-weight models from Google DeepMind. <strong className="text-[var(--fg)]">gemma-4-26b-a4b-it</strong> is the default model for profile summaries and matching, and <strong className="text-[var(--fg)]">gemma-4-31b-it</strong> is the larger alternative. Closed proprietary APIs are not used, so the system stays auditable with no vendor lock-in.
             </p>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 font-mono text-xs">
               <div className="flex gap-2"><dt className="text-[var(--fg-subtle)]">Default:</dt><dd className="text-[var(--fg)]">gemma-4-26b-a4b-it</dd></div>

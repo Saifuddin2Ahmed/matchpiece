@@ -18,6 +18,7 @@ import { Avatar } from './Avatar';
 import { PageHeader } from './PageHeader';
 import { HEADER_IMAGES } from '../lib/headerImages';
 import { askKwegatta } from '../services/api';
+import { BRAND_NAME, PRIMARY_URL } from '../lib/brand';
 
 interface PeopleViewProps {
   currentProfile: Profile | null;
@@ -220,7 +221,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold font-display text-[var(--fg)] tracking-tight">
-                Ask Kwegatta
+                Ask {BRAND_NAME}
               </h2>
               <p className="text-xs text-[var(--fg-muted)]">
                 Find collaborators by describing what you need in plain sentences.
@@ -300,7 +301,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
             <div className="flex items-center gap-2.5 text-xs text-[var(--fg)]">
               <Lock className="w-4 h-4 text-[var(--gold-text)] flex-shrink-0" />
               <div>
-                <span className="font-semibold text-[var(--fg)]">Sign in to ask Kwegatta</span>
+                <span className="font-semibold text-[var(--fg)]">Sign in to ask {BRAND_NAME}</span>
                 <p className="text-[13px] text-[var(--fg-muted)]">
                   Ask in plain sentences to match with collaborators anywhere.
                 </p>
@@ -311,7 +312,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
               onClick={onOpenSignIn}
               className="kw-btn kw-btn-gold text-xs py-2 px-4 font-bold active:scale-95 shadow-sm whitespace-nowrap cursor-pointer"
             >
-              Sign in to ask Kwegatta
+              Sign in to ask {BRAND_NAME}
             </button>
           </div>
         )}
@@ -522,7 +523,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
                 <strong className="text-[var(--fg)]">Profile indexing</strong>: Every member's headline, needs, offers, and learning goals are indexed automatically.
               </li>
               <li>
-                <strong className="text-[var(--fg)]">Natural language search</strong>: Ask Kwegatta queries search across open-weight embeddings.
+                <strong className="text-[var(--fg)]">Natural language search</strong>: Ask {BRAND_NAME} queries search across open-weight embeddings.
               </li>
             </ol>
           </div>
@@ -545,7 +546,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
               <>
                 <button
                   onClick={() => {
-                    const inviteUrl = `https://kwegatta.ai.studio/#/u/${currentProfile.id}`;
+                    const inviteUrl = `${PRIMARY_URL}/#/u/${currentProfile.id}`;
                     if (navigator.clipboard) {
                       navigator.clipboard.writeText(inviteUrl);
                     }

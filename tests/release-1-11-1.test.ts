@@ -160,7 +160,7 @@ describe('RSVP cancel: server', () => {
     const mail = sent[0];
     expect(mail.to).toBe('c3-member@kwegatta.test');
     expect(mail.subject).toBe('Registration cancelled: Cancellation Email Night');
-    expect(mail.from).toBe(`"Kwegatta Events" <${SMTP_USER}>`);
+    expect(mail.from).toBe(`"Matchpiece Events" <${SMTP_USER}>`);
     expect(mail.text).toContain('has been cancelled');
     expect(mail.html).toContain('Cancellation Email Night');
     expect(mail.attachments).toBeUndefined();
@@ -274,8 +274,8 @@ describe('Email: HTML part, escaping, From name and logging', () => {
     description: 'desc'
   };
 
-  it('From is "Kwegatta Events <SMTP_USER>"', () => {
-    expect(buildEmailFrom(SMTP_USER)).toBe(`"Kwegatta Events" <${SMTP_USER}>`);
+  it('From is "Matchpiece Events <SMTP_USER>"', () => {
+    expect(buildEmailFrom(SMTP_USER)).toBe(`"Matchpiece Events" <${SMTP_USER}>`);
     expect(buildEmailFrom('')).toBe('');
   });
 
@@ -293,7 +293,7 @@ describe('Email: HTML part, escaping, From name and logging', () => {
     expect(html).toContain('Hall &quot;A&quot;');
     expect(html).toContain('View your ticket');
     expect(html).toContain('Sat, 14 Nov 2026 · 2:00 PM EAT');
-    expect(html).toContain('You received this because you registered on Kwegatta. Reply to contact the organiser.');
+    expect(html).toContain('You received this because you registered on Matchpiece. Reply to contact the organiser.');
     expect(html).toContain('Add to calendar');
     expect(html).not.toMatch(/<style|<link|<img/i);
     expect(text).toContain('Date & Time: Sat, 14 Nov 2026 · 2:00 PM EAT');
@@ -312,7 +312,7 @@ describe('Email: HTML part, escaping, From name and logging', () => {
     expect(sent[0].html).toContain('<!doctype html>');
     expect(sent[0].text).toContain('Hi Ann,');
     expect(sent[0].attachments[0].filename).toBe('event.ics');
-    expect(sent[0].from).toBe(`"Kwegatta Events" <${SMTP_USER}>`);
+    expect(sent[0].from).toBe(`"Matchpiece Events" <${SMTP_USER}>`);
   });
 
   it('logs only "[Email] sent" or "[Email] failed: <reason>" with no address or password', async () => {

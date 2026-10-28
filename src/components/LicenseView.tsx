@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Scale, Github, ExternalLink } from 'lucide-react';
+import { BRAND_NAME } from '../lib/brand';
 
 interface LicenseViewProps {
   onBack: () => void;
@@ -30,7 +31,7 @@ export const LicenseView: React.FC<LicenseViewProps> = ({ onBack }) => {
           MIT License
         </h1>
         <p className="text-[14px] text-[var(--fg-muted)] leading-relaxed">
-          Kwegatta is fully open-source software licensed under the permissive MIT License. You are free to use, modify, study, distribute, and contribute.
+          {BRAND_NAME} is fully open-source software licensed under the permissive MIT License. You are free to use, modify, study, distribute, and contribute.
         </p>
       </div>
 

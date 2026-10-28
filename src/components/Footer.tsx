@@ -1,6 +1,7 @@
 import React from 'react';
 import { Github } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
+import { BRAND_TAGLINE, COPYRIGHT_LINE } from '../lib/brand';
 
 interface FooterProps {
   onNavigate: (tab: string, elementId?: string) => void;
@@ -30,11 +31,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       <div className="w-full h-[2px] bg-gradient-to-r from-[#F5B700] to-[#12B5A6]" />
 
       <div className="max-w-[1200px] mx-auto px-4 py-5 sm:py-6 flex flex-col items-center text-center space-y-3 sm:space-y-4">
-        {/* Brand block: (logo mark) Kwegatta + Tagline */}
+        {/* Brand block: logo mark, name and tagline */}
         <div className="flex flex-col items-center space-y-1">
           <BrandLogo size="md" />
           <p className="text-[13px] text-[var(--fg-muted)] leading-snug max-w-sm">
-            Find the people you should build and learn with.
+            {BRAND_TAGLINE}.
           </p>
         </div>
 
@@ -126,7 +127,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Bottom lines: Two centred lines, one under the other with 4px gap */}
         <div className="pt-1 text-[13px] text-[var(--fg-subtle)] flex flex-col items-center gap-1">
-          <p>© 2026 Kwegatta</p>
+          <p>{COPYRIGHT_LINE}</p>
           <p>
             <a
               href="https://ai.google.dev/gemma/docs/core"

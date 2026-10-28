@@ -1,6 +1,6 @@
 # Security Policy
 
-The Kwegatta core team takes security, privacy, and responsible disclosure seriously. Because Kwegatta connects students and builders and processes public profile information and private contact details, protecting user data and preserving system integrity is our highest priority.
+The Matchpiece core team takes security, privacy, and responsible disclosure seriously. Because Matchpiece connects students and builders and processes public profile information and private contact details, protecting user data and preserving system integrity is our highest priority.
 
 ---
 
@@ -19,7 +19,7 @@ Only the latest release on the primary branch is currently supported for securit
 
 **Please do NOT file public GitHub issues for security vulnerabilities.**
 
-If you discover or suspect a security flaw in Kwegatta:
+If you discover or suspect a security flaw in Matchpiece:
 
 1. **Email the Maintainers Privately**:
    Send an encrypted or private email to:

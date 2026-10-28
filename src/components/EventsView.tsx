@@ -82,6 +82,7 @@ import {
 } from '../services/api';
 import { findRecentDuplicate, sortForTab } from '../lib/eventTiming';
 import { validateEventTitle, EVENT_TITLE_MAX } from '../lib/eventTitle';
+import { BRAND_NAME } from '../lib/brand';
 
 export const EVENT_KIND_HELP = {
   event: 'Something people attend at a set date and time, in person or online.',
@@ -365,7 +366,7 @@ export const EventsView: React.FC<EventsViewProps> = ({
     }
     try {
       const conn = await requestMemberConnect(currentProfile.id, person.id, person.reason || 'Event networking match');
-      const waUrl = formatWhatsAppUrl(conn.whatsapp, `Hi ${person.name.split(' ')[0]}, I saw you on Kwegatta for ${detailedItem?.title || 'the event'} and would love to connect!`);
+      const waUrl = formatWhatsAppUrl(conn.whatsapp, `Hi ${person.name.split(' ')[0]}, I saw you on ${BRAND_NAME} for ${detailedItem?.title || 'the event'} and would love to connect!`);
       const link = waUrl || conn.linkedin;
       if (link) {
         window.open(link, '_blank', 'noopener,noreferrer');
@@ -607,7 +608,7 @@ export const EventsView: React.FC<EventsViewProps> = ({
     if (navigator.share) {
       navigator.share({
         title: item.title,
-        text: item.kind === 'event' ? `Join me at ${item.title} on Kwegatta!` : `Check out this opportunity: ${item.title}`,
+        text: item.kind === 'event' ? `Join me at ${item.title} on ${BRAND_NAME}!` : `Check out this opportunity: ${item.title}`,
         url: shareUrl
       }).catch(() => {});
     } else if (navigator.clipboard) {
@@ -1792,7 +1793,7 @@ export const EventsView: React.FC<EventsViewProps> = ({
                 <div className="flex flex-wrap gap-2 text-xs">
                   {detailedItem.contact_phone && (
                     <a
-                      href={`https://wa.me/${detailedItem.contact_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I'm registered for ${detailedItem.title} on Kwegatta.`)}`}
+                      href={`https://wa.me/${detailedItem.contact_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I'm registered for ${detailedItem.title} on ${BRAND_NAME}.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="kw-btn px-3 py-1.5 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 font-semibold flex items-center gap-1.5 hover:bg-emerald-500/20"
@@ -3297,7 +3298,7 @@ export const EventsView: React.FC<EventsViewProps> = ({
               </div>
 
               <p className="text-xs text-[var(--fg-muted)]">
-                Help keep Kwegatta safe and genuine. Reports are strictly confidential and reviewed by community administrators.
+                Help keep {BRAND_NAME} safe and genuine. Reports are strictly confidential and reviewed by community administrators.
               </p>
 
               <form onSubmit={handleReportSubmit} className="space-y-4 text-xs">
@@ -4846,7 +4847,7 @@ export const EventsView: React.FC<EventsViewProps> = ({
             </div>
 
             <p className="text-xs text-[var(--fg-muted)]">
-              Help keep Kwegatta safe and genuine. Reports are strictly confidential and reviewed by community administrators.
+              Help keep {BRAND_NAME} safe and genuine. Reports are strictly confidential and reviewed by community administrators.
             </p>
 
             <form onSubmit={handleReportSubmit} className="space-y-4 text-xs">

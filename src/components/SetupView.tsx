@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Database, UserMinus, UserPlus, LogOut, ShieldCheck, Cpu } from 'lucide-react';
 import { callGemma, GEMMA_MODEL_ID, db } from '../services/api';
+import { BRAND_NAME } from '../lib/brand';
 
 interface SetupViewProps {
   onSignOut: () => void;
@@ -30,7 +31,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
 
     try {
       const response = await callGemma(
-        'Confirm you are Gemma 4 running in open-weight mode for Kwegatta at Hack Day Kampala x MUBS. Answer in one crisp sentence.',
+        `Confirm you are Gemma 4 running in open-weight mode for ${BRAND_NAME} at Hack Day Kampala x MUBS. Answer in one crisp sentence.`,
         { temperature: 0.2 }
       );
       setTestResult(`Success: ${response}`);

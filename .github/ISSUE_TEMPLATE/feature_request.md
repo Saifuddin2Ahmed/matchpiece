@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an idea or enhancement for Kwegatta
+about: Suggest an idea or enhancement for Matchpiece
 title: '[FEAT] '
 labels: ['enhancement']
 assignees: ''

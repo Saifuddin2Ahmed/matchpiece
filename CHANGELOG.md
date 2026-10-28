@@ -1,8 +1,24 @@
 # Changelog
 
-All notable changes to **Kwegatta** are documented in this file.
+All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.13.0] - 2026-10-28
+
+### Changed
+- Kwegatta is now called **Matchpiece**, with the tagline "Find your missing piece". The new name is used in the header, footer, page titles, share previews, the installed app name, the About page, messages, emails, the README and the docs. The logo mark stays the same.
+- The main address is now https://matchpiece.ai.studio. Share links, event pages, calendar files, the sitemap and links in emails use it.
+- Event emails now come from "Matchpiece Events".
+- The About page no longer explains the old name. It now says: "Matchpiece (formerly Kwegatta) won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS." The footer reads "© 2026 Matchpiece · formerly Kwegatta".
+- The Hack Day award, story and photos are unchanged, and now credit "the Matchpiece team (then Kwegatta)".
+- The default share image and the event share images show the new name. Event share images get a new address, so apps that cached the old picture fetch the new one.
+
+### Added
+- The old address https://kwegatta.ai.studio sends page visits to https://matchpiece.ai.studio with the same path and query (permanent redirect). The part after # is kept by the browser, so ticket and profile links still work. API calls, the service worker, the app manifest, share images and other files are still served at the old address, so open tabs and installed apps keep working until they reload. This is turned on with the LEGACY_HOSTS and PRIMARY_URL settings.
+
+### Notes
+- Saved data, sign-in sessions, ticket codes and links are unchanged. Internal names such as database collections, saved browser settings and the project ID still use "kwegatta".
 
 ## [1.12.0] - 2026-10-19
 

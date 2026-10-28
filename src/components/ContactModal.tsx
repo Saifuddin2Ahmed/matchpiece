@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, Check, Copy, ExternalLink, Github, MapPin } from 'lucide-react';
 import { useDialogA11y } from '../hooks/useDialogA11y';
+import { BRAND_NAME } from '../lib/brand';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
               <h3 id="contact-modal-title" className="font-display font-bold text-base text-[var(--fg)]">
                 Contact Maintainers
               </h3>
-              <p className="text-xs text-[var(--fg-muted)]">Kwegatta Open-Source Team</p>
+              <p className="text-xs text-[var(--fg-muted)]">{BRAND_NAME} Open-Source Team</p>
             </div>
           </div>
           <button
@@ -111,7 +112,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
         {/* External Links */}
         <div className="space-y-2.5 pt-2">
           <a
-            href={`mailto:${email}?subject=Kwegatta%20Inquiry`}
+            href={`mailto:${email}?subject=${encodeURIComponent(`${BRAND_NAME} Inquiry`)}`}
             className="w-full kw-btn kw-btn-ghost text-xs py-2 px-3 flex items-center justify-center gap-2 border border-[var(--card-border)] hover:border-[var(--gold)]"
           >
             <Mail className="w-3.5 h-3.5 text-[var(--gold-text)]" />

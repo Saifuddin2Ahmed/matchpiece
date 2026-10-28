@@ -29,7 +29,7 @@ async function runBenchmark() {
   const gemmaModels = modelNames.filter((name: string) => name.toLowerCase().includes('gemma'));
   console.log(gemmaModels);
 
-  const profilePrompt = `Generate a concise headline, bio, and 4 skill tags for a new member on Kwegatta:
+  const profilePrompt = `Generate a concise headline, bio, and 4 skill tags for a new member on Matchpiece:
 Name: Sarah Namubiru
 Role: Business Analyst & Founder
 Stage: Ideation

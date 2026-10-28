@@ -13,6 +13,7 @@ import { Profile } from '../types';
 import { getInitials, MIN_MEMBERS_FOR_STATS } from '../utils';
 import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
+import { BRAND_NAME, BRAND_FORMERLY } from '../lib/brand';
 
 export interface HeroProps {
   profiles: Profile[];
@@ -131,7 +132,7 @@ export const HeroSection: React.FC<HeroProps> = ({
               Find the people you should build and learn with.
             </h1>
             <p className="text-base sm:text-lg text-[var(--fg-muted)] leading-relaxed font-normal max-w-2xl text-balance">
-              Say what you need and what you offer. In about a minute, Kwegatta matches you with people who complete you: co-founders, teammates, mentors and study partners.
+              Say what you need and what you offer. In about a minute, {BRAND_NAME} matches you with people who complete you: co-founders, teammates, mentors and study partners.
             </p>
           </div>
 
@@ -162,14 +163,14 @@ export const HeroSection: React.FC<HeroProps> = ({
                 src={photos.hero}
                 srcSet={`${photos.hero} 800w, ${photos.hero.replace('800.webp', '1600.webp')} 1600w`}
                 sizes="(max-width: 1024px) 100vw, 42vw"
-                alt="Kwegatta team building at Makerere University Business School"
+                alt={`The ${BRAND_NAME} team (then ${BRAND_FORMERLY}) building at Makerere University Business School`}
                 className="w-full h-full object-cover"
                 width={800}
                 height={533}
               />
             </div>
             <figcaption className="text-xs text-[var(--fg-muted)] text-center sm:text-left">
-              Kwegatta team building at MUBS Entrepreneurship Centre, Kampala.
+              The {BRAND_NAME} team (then {BRAND_FORMERLY}) building at MUBS Entrepreneurship Centre, Kampala.
             </figcaption>
           </figure>
         </div>
@@ -225,10 +226,10 @@ export const KampalaStorySection: React.FC<KampalaStoryProps> = () => {
               Hacktoberfest 2026 Hack Day Kampala x MUBS took place on Friday 2 October 2026 at Makerere University Business School, hosted by Web3 Club MUBS and GDG on Campus MUBS, powered by MLH and DEV.
             </p>
             <p>
-              We entered the Best Open-Source AI Project challenge: build something real with an open-weight AI model. We built Kwegatta using strictly Gemma 4.
+              We entered the Best Open-Source AI Project challenge: build something real with an open-weight AI model. We built {BRAND_NAME}, then called {BRAND_FORMERLY}, using strictly Gemma 4.
             </p>
             <p>
-              Sixty-seven people took part and eight projects were built. Kwegatta was awarded 1st place, and the team was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
+              Sixty-seven people took part and eight projects were built. The {BRAND_NAME} team (then {BRAND_FORMERLY}) was awarded 1st place and was forwarded to the MUBS Entrepreneurship, Innovation and Incubation Centre for its incubator.
             </p>
           </div>
         </div>
@@ -259,7 +260,7 @@ export const KampalaStorySection: React.FC<KampalaStoryProps> = () => {
                 src={photos.team}
                 srcSet={`${photos.team} 800w, ${photos.team.replace('800.webp', '1600.webp')} 1600w`}
                 sizes="(max-width: 1024px) 100vw, 25vw"
-                alt="Kwegatta team working on code and UI"
+                alt={`The ${BRAND_NAME} team (then ${BRAND_FORMERLY}) working on code and UI`}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 width={800}
@@ -267,7 +268,7 @@ export const KampalaStorySection: React.FC<KampalaStoryProps> = () => {
               />
             </div>
             <figcaption className="text-[13px] text-[var(--fg-muted)]">
-              Collaborating on Kwegatta architecture and UI.
+              Collaborating on {BRAND_NAME} architecture and UI.
             </figcaption>
           </figure>
         </div>

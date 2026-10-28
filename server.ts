@@ -18,6 +18,7 @@ import { formatTzLabel } from './src/lib/timezoneLabel';
 import { validateEventTitle } from './src/lib/eventTitle';
 import { validateTeamPayload, checkPhotoDataUrl, checkX, checkWebsite, whatsappLink, TEAM_VISIBILITY_FLAGS } from './src/lib/teamFields';
 import { getEffectiveStartMs, getEffectiveEndMs, getOpportunityDeadlineMs, sortForTab, findRecentDuplicate } from './src/lib/eventTiming';
+import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_FORMERLY, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -180,6 +181,63 @@ export function stripUndefined<T>(value: T): T {
 
 // Security: Disable X-Powered-By header to prevent fingerprinting
 app.disable('x-powered-by');
+
+/* =========================================================================
+   LEGACY HOST REDIRECT
+   On a legacy host (env LEGACY_HOSTS, e.g. kwegatta.ai.studio), page requests
+   get a 301 to PRIMARY_URL with the same path and query. The browser keeps the
+   #fragment, so ticket and profile links keep working. API calls, the service
+   worker, the manifest, OG images and static files are served as before, so
+   open tabs and installed apps keep working until they reload.
+   Request logs show the public ai.studio host in the request URL (the Host
+   header); X-Forwarded-Host is checked too in case a proxy sets it.
+   ========================================================================= */
+export function parseLegacyHosts(raw: string | undefined): string[] {
+  return String(raw || '')
+    .split(',')
+    .map(h => h.trim().toLowerCase().replace(/:\d+$/, ''))
+    .filter(Boolean);
+}
+
+function requestHosts(hostHeader: unknown, forwardedHost: unknown): string[] {
+  const first = (v: unknown) => String(Array.isArray(v) ? v[0] : v || '').split(',')[0].trim().toLowerCase().replace(/:\d+$/, '');
+  return [first(forwardedHost), first(hostHeader)].filter(Boolean);
+}
+
+/** Paths that stay on the legacy host: API, service worker, manifest, OG images and any file with an extension. */
+export function isLegacyPassthroughPath(pathname: string): boolean {
+  if (pathname === '/api' || pathname.startsWith('/api/')) return true;
+  if (pathname.startsWith('/og/') || pathname.startsWith('/assets/')) return true;
+  if (pathname === '/healthz') return true;
+  const last = pathname.slice(pathname.lastIndexOf('/') + 1);
+  return /\.[a-z0-9]+$/i.test(last);
+}
+
+/** The 301 target for a request on a legacy host, or null to serve it normally. */
+export function legacyRedirectTarget(
+  req: { method: string; originalUrl: string; headers: Record<string, unknown> },
+  env: { LEGACY_HOSTS?: string; PRIMARY_URL?: string } = process.env
+): string | null {
+  const legacy = parseLegacyHosts(env.LEGACY_HOSTS);
+  if (legacy.length === 0) return null;
+  if (req.method !== 'GET' && req.method !== 'HEAD') return null;
+  const hosts = requestHosts(req.headers['host'], req.headers['x-forwarded-host']);
+  if (!hosts.some(h => legacy.includes(h))) return null;
+  const url = String(req.originalUrl || '/');
+  const pathname = url.split('?')[0] || '/';
+  if (!url.startsWith('/') || isLegacyPassthroughPath(pathname)) return null;
+  const primary = String(env.PRIMARY_URL || PRIMARY_URL).trim().replace(/\/+$/, '');
+  if (!/^https:\/\/[a-z0-9.-]+$/i.test(primary)) return null;
+  if (legacy.includes(new URL(primary).host.toLowerCase())) return null;
+  return primary + url;
+}
+
+app.use((req, res, next) => {
+  const target = legacyRedirectTarget(req as any);
+  if (!target) return next();
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.redirect(301, target);
+});
 
 // Configure Express trust proxy for Google Cloud Run (1 proxy hop = Google Front End / GFE).
 // GFE appends the true connecting client IP as the last IP entry in X-Forwarded-For.
@@ -1141,7 +1199,7 @@ function createInitialStore(demo: boolean = isDemoMode): StoreData {
         datetime: new Date(Date.now() + 86400000 * 5).toISOString(),
         location: 'Makerere Innovation Pod, Kampala',
         cover_image: '',
-        registration_link: 'https://kwegatta.ai.studio/#/events',
+        registration_link: `${PRIMARY_URL}/#/events`,
         created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
         published: true,
         attendee_ids: ['demo-amina', 'demo-brian', 'demo-joseph']
@@ -1153,7 +1211,7 @@ function createInitialStore(demo: boolean = isDemoMode): StoreData {
         description: 'Up to $5,000 equity-free seed funding and compute credits for builder teams applying open-weight models to local agriculture, education, and fintech in Uganda.',
         opportunity_type: 'Grant',
         deadline: new Date(Date.now() + 86400000 * 18).toISOString(),
-        link: 'https://kwegatta.ai.studio',
+        link: PRIMARY_URL,
         created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
         published: true,
         attendee_ids: ['demo-grace', 'demo-peter']
@@ -1165,7 +1223,7 @@ function createInitialStore(demo: boolean = isDemoMode): StoreData {
         description: '48-hour hardware and IoT sprint focused on solar energy monitoring, clean cooking tech, and urban sustainability.',
         opportunity_type: 'Hackathon',
         deadline: new Date(Date.now() + 86400000 * 10).toISOString(),
-        link: 'https://kwegatta.ai.studio',
+        link: PRIMARY_URL,
         created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
         published: true,
         attendee_ids: ['demo-peter', 'demo-amina']
@@ -1184,7 +1242,7 @@ function createInitialStore(demo: boolean = isDemoMode): StoreData {
         id: 'audit-init',
         timestamp: new Date().toISOString(),
         action: 'SYSTEM_BOOT',
-        details: demo ? 'Kwegatta system loaded in Demo Mode with sample cohort.' : 'Kwegatta system loaded in clean production state.',
+        details: demo ? `${BRAND_NAME} system loaded in Demo Mode with sample cohort.` : `${BRAND_NAME} system loaded in clean production state.`,
         admin: 'system'
       }
     ],
@@ -2790,7 +2848,7 @@ export function buildGemmaPrompt(task: GemmaTask, data: any): string {
   switch (task) {
     case 'polish_profile': {
       const { name = '', role = '', headline = '', offers = '', needs = '', skills = [] } = data || {};
-      return `You are Kwegatta's profile assistant for the Kampala tech ecosystem.
+      return `You are ${BRAND_NAME}'s profile assistant for the Kampala tech ecosystem.
 Polish and structure this member's profile for peer learning and project collaboration.
 Raw inputs:
 - Name: ${name}
@@ -2812,7 +2870,7 @@ Return ONLY this JSON, no other text:
     case 'match': {
       const { me = {}, candidate = {}, candidates = [] } = data || {};
       if (Array.isArray(candidates) && candidates.length > 0) {
-        return `You are Kwegatta's matchmaking engine in Kampala (MUBS x EIIC).
+        return `You are ${BRAND_NAME}'s matchmaking engine in Kampala (MUBS x EIIC).
 Target Member (ME):
 Name: ${me.name || 'Member'}, Role: ${me.role || 'builder'}, Offers: ${me.offers || ''}, Needs: ${me.needs || ''}, Skills: ${(me.skills || []).join(', ')}
 
@@ -2830,7 +2888,7 @@ Pick top 3 best complementary partners for ME. Return ONLY a JSON array, no othe
   }
 ]`;
       }
-      return `You are Kwegatta's collaboration matchmaking engine in Kampala.
+      return `You are ${BRAND_NAME}'s collaboration matchmaking engine in Kampala.
 Analyze whether these two tech ecosystem members should connect.
 Member 1:
 Name: ${me.name || 'Member 1'}, Role: ${me.role || 'builder'}, Offers: ${me.offers || ''}, Needs: ${me.needs || ''}
@@ -2846,7 +2904,7 @@ Return ONLY this JSON object:
     }
     case 'tag_post': {
       const { body = '', kind = 'idea', title = '' } = data || {};
-      return `You are Kwegatta's community project wall tagger.
+      return `You are ${BRAND_NAME}'s community project wall tagger.
 Analyze this member's post and return 2 to 4 technical topic tags.
 Post Kind: ${kind}
 Title: ${title}
@@ -2860,7 +2918,7 @@ Return ONLY a JSON array of tags:
       const candidateList = Array.isArray(candidates)
         ? candidates.slice(0, 30).map((c: any) => `ID: ${c.id}, Name: ${c.name}, Role: ${c.role}, Offers: ${c.offers}, Needs: ${c.needs}, Skills: ${(c.skills || []).join(', ')}`).join('\n')
         : '';
-      return `You are Kwegatta's semantic search assistant for the Kampala tech community.
+      return `You are ${BRAND_NAME}'s semantic search assistant for the Kampala tech community.
 Search query: "${query}"
 Evaluate community members:
 ${candidateList}
@@ -2881,7 +2939,7 @@ Return ONLY a JSON object with matches array:
       const attendeeList = Array.isArray(attendees)
         ? attendees.slice(0, 30).map((a: any) => `ID: ${a.id}, Name: ${a.name}, Role: ${a.role}, Offers: ${a.offers}, Needs: ${a.needs}`).join('\n')
         : '';
-      return `You are Kwegatta's event networking engine for "${event_title}".
+      return `You are ${BRAND_NAME}'s event networking engine for "${event_title}".
 Attendee ME: Name: ${me.name || 'Attendee'}, Role: ${me.role || 'builder'}, Offers: "${me.offers || ''}", Needs: "${me.needs || ''}"
 Other Attendees:
 ${attendeeList}
@@ -3220,7 +3278,7 @@ app.post('/api/ai/ask-kwegatta', askLimiter, async (req: Request, res: Response)
 
   // Require a valid signed-in session: 401 otherwise
   if (!callerId && !isAdmin) {
-    return res.status(401).json({ error: 'Sign in required to ask Kwegatta' });
+    return res.status(401).json({ error: `Sign in required to ask ${BRAND_NAME}` });
   }
 
   // Read active members (excluding unlinked legacy profiles and blocked members)
@@ -3260,7 +3318,7 @@ app.post('/api/ai/ask-kwegatta', askLimiter, async (req: Request, res: Response)
     institution: p.institution || ''
   }));
 
-  const prompt = `You are Kwegatta's intelligent matchmaking engine for Ugandan builders, creators, and students.
+  const prompt = `You are ${BRAND_NAME}'s intelligent matchmaking engine for Ugandan builders, creators, and students.
 A user asked: "${cleanQuery}".
 Based STRICTLY and ONLY on what members wrote in their profiles below, select up to 5 best matching members.
 
@@ -3951,25 +4009,25 @@ app.get('/api/admin/export', (req: Request, res: Response) => {
   if (type === 'matches') {
     if (format === 'json') {
       res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', 'attachment; filename="kwegatta-matches.json"');
+      res.setHeader('Content-Disposition', 'attachment; filename="matchpiece-matches.json"');
       return res.send(JSON.stringify(store.matches, null, 2));
     } else {
       const csvHeader = 'id,a_id,b_id,score,reason,created_at\n';
       const rows = store.matches.map(m => `"${m.id}","${m.a_id}","${m.b_id}",${m.score},"${(m.reason || '').replace(/"/g, '""')}","${m.created_at}"`).join('\n');
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="kwegatta-matches.csv"');
+      res.setHeader('Content-Disposition', 'attachment; filename="matchpiece-matches.csv"');
       return res.send(csvHeader + rows);
     }
   } else {
     if (format === 'json') {
       res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', 'attachment; filename="kwegatta-members.json"');
+      res.setHeader('Content-Disposition', 'attachment; filename="matchpiece-members.json"');
       return res.send(JSON.stringify(store.profiles, null, 2));
     } else {
       const csvHeader = 'id,name,role,headline,offers,needs,whatsapp,created_at\n';
       const rows = store.profiles.map(p => `"${p.id}","${p.name}","${p.role}","${(p.headline || '').replace(/"/g, '""')}","${(p.offers || '').replace(/"/g, '""')}","${(p.needs || '').replace(/"/g, '""')}","${p.whatsapp || ''}","${p.created_at}"`).join('\n');
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="kwegatta-members.csv"');
+      res.setHeader('Content-Disposition', 'attachment; filename="matchpiece-members.csv"');
       return res.send(csvHeader + rows);
     }
   }
@@ -4456,13 +4514,13 @@ app.delete('/api/account', async (req: Request, res: Response) => {
 // App configuration diagnostics
 app.get('/api/config', (_req: Request, res: Response) => {
   res.json({
-    appName: 'Kwegatta',
+    appName: BRAND_NAME,
     model: DEFAULT_OPEN_WEIGHT_MODEL,
     allowedModels: ALLOWED_OPEN_WEIGHT_MODELS,
     hasServerApiKey: Boolean(process.env.GEMINI_API_KEY),
     isDemoMode,
     storage: storageMode,
-    appUrl: 'https://kwegatta.ai.studio'
+    appUrl: getPublicAppUrl()
   });
 });
 
@@ -4744,9 +4802,9 @@ try {
   const distIdx = path.join(__dirname, 'dist', 'index.html');
   const rootIdx = path.join(__dirname, 'index.html');
   if (fs.existsSync(distIdx)) {
-    cachedIndexHtmlTemplate = fs.readFileSync(distIdx, 'utf-8');
+    cachedIndexHtmlTemplate = applyBrandToHtml(fs.readFileSync(distIdx, 'utf-8'));
   } else if (fs.existsSync(rootIdx)) {
-    cachedIndexHtmlTemplate = fs.readFileSync(rootIdx, 'utf-8');
+    cachedIndexHtmlTemplate = applyBrandToHtml(fs.readFileSync(rootIdx, 'utf-8'));
   }
 } catch (_) {}
 
@@ -4759,18 +4817,18 @@ function getIndexHtmlTemplate(): string {
   }
   try {
     if (!isDev && fs.existsSync(distIdx)) {
-      cachedIndexHtmlTemplate = fs.readFileSync(distIdx, 'utf-8');
+      cachedIndexHtmlTemplate = applyBrandToHtml(fs.readFileSync(distIdx, 'utf-8'));
       return cachedIndexHtmlTemplate;
     }
     if (fs.existsSync(rootIdx)) {
-      const content = fs.readFileSync(rootIdx, 'utf-8');
+      const content = applyBrandToHtml(fs.readFileSync(rootIdx, 'utf-8'));
       if (!isDev) cachedIndexHtmlTemplate = content;
       return content;
     }
   } catch (_) {}
   return (
     cachedIndexHtmlTemplate ||
-    '<!doctype html><html lang="en"><head><meta charset="UTF-8" /><title>Kwegatta: find the people you should build and learn with</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>'
+    `<!doctype html><html lang="en"><head><meta charset="UTF-8" /><title>${BRAND_TITLE}</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>`
   );
 }
 
@@ -4799,7 +4857,7 @@ export function isEventPubliclyVisible(item: any): boolean {
   return true;
 }
 
-export const OG_RENDER_VERSION = '3';
+export const OG_RENDER_VERSION = '4';
 
 export function computeEventOgVersionHash(item: any): string {
   const raw = `v${OG_RENDER_VERSION}|${item?.cover_image || ''}|${item?.title || ''}|${item?.starts_at || item?.datetime || ''}`;
@@ -4849,7 +4907,7 @@ export function buildEventMetaDescription(item: any): string {
 }
 
 export function getPublicAppUrl(): string {
-  const raw = process.env.PUBLIC_SHARE_URL || 'https://kwegatta.ai.studio';
+  const raw = process.env.PUBLIC_SHARE_URL || PRIMARY_URL;
   return raw.replace(/\/+$/, '');
 }
 
@@ -4873,10 +4931,10 @@ export function injectEventOgIntoHtml(baseHtml: string, item: any): string {
     .replace(/<link\s+rel=["']canonical["'][^>]*>\s*/gi, '');
 
   const injectedBlock = [
-    `<title>${escapedTitle} · Kwegatta</title>`,
+    `<title>${escapedTitle} · ${BRAND_NAME}</title>`,
     `    <meta name="description" content="${escapedDesc}" />`,
     `    <meta property="og:type" content="website" />`,
-    `    <meta property="og:site_name" content="Kwegatta" />`,
+    `    <meta property="og:site_name" content="${BRAND_NAME}" />`,
     `    <meta property="og:title" content="${escapedTitle}" />`,
     `    <meta property="og:description" content="${escapedDesc}" />`,
     `    <meta property="og:url" content="${escapeHtml(canonicalUrl)}" />`,
@@ -4920,7 +4978,7 @@ const ogImageLruCache = new Map<string, Buffer>();
 const OG_IMAGE_LRU_MAX = 100;
 
 function wrapTitleLines(rawTitle: string, maxCharsPerLine = 34): [string, string?] {
-  const clean = stripControlChars(rawTitle || 'Kwegatta Event');
+  const clean = stripControlChars(rawTitle || `${BRAND_NAME} Event`);
   if (clean.length <= maxCharsPerLine) return [clean];
   const words = clean.split(' ');
   let line1 = '';
@@ -4973,10 +5031,50 @@ export function canInterRender(text: string): boolean {
   return !NON_INTER_CHAR_REGEX.test(text);
 }
 
+/**
+ * Default share image (public/og-image.png), rendered by scripts/render-og-image.ts.
+ * Same layout as before; only the name and wording come from src/lib/brand.ts.
+ */
+export function buildDefaultOgSvg(): string {
+  const mark = `<g transform="translate(64 115) scale(0.8)">
+      <path d="M 210 120 C 138.2 120 80 178.2 80 250 C 80 321.8 138.2 380 210 380 C 265.4 380 312.4 345.3 330.8 296 L 277.2 280.8 C 265.4 309.8 239.8 330 210 330 C 165.8 330 130 294.2 130 250 C 130 205.8 165.8 170 210 170 C 239.8 170 265.4 190.2 277.2 219.2 L 330.8 204 C 312.4 154.7 265.4 120 210 120 Z" fill="#F5B700"/>
+      <path d="M 302 120 C 246.6 120 199.6 154.7 181.2 204 L 234.8 219.2 C 246.6 190.2 272.2 170 302 170 C 346.2 170 382 205.8 382 250 C 382 294.2 346.2 330 302 330 C 272.2 330 246.6 309.8 234.8 280.8 L 181.2 296 C 199.6 345.3 246.6 380 302 380 C 373.8 380 432 321.8 432 250 C 432 178.2 373.8 120 302 120 Z" fill="#12B5A6"/>
+      <path d="M 234.8 219.2 C 246.6 190.2 272.2 170 302 170 C 314.5 170 326.2 173.6 336 179.8 L 362 135.2 C 344.2 125.5 323.8 120 302 120 C 246.6 120 199.6 154.7 181.2 204 L 234.8 219.2 Z" fill="#12B5A6"/>
+    </g>`;
+  return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#070B12"/>
+        <stop offset="60%" stop-color="#0E1525"/>
+        <stop offset="100%" stop-color="#1A160B"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0.75" cy="0.25" r="0.45">
+        <stop offset="0%" stop-color="#F5B700" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="#F5B700" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <rect width="1200" height="630" fill="url(#glow)"/>
+    <rect x="24" y="24" width="1152" height="582" rx="20" fill="none" stroke="#F5B700" stroke-opacity="0.3" stroke-width="2"/>
+    ${mark}
+    <text x="460" y="242" fill="#F5B700" font-family="Inter, sans-serif" font-size="64" font-weight="800" letter-spacing="3">${escapeHtml(BRAND_NAME.toUpperCase())}</text>
+    <text x="460" y="306" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="30" font-weight="700">${escapeHtml(BRAND_TAGLINE)}</text>
+    <text x="460" y="362" fill="#94A3B8" font-family="Inter, sans-serif" font-size="20">${escapeHtml(`Formerly ${BRAND_FORMERLY} · matchmaking powered by open-weight Gemma 4`)}</text>
+    <rect x="460" y="420" width="180" height="42" rx="21" fill="#F5B700" fill-opacity="0.12" stroke="#F5B700" stroke-width="1.5"/>
+    <text x="550" y="447" text-anchor="middle" fill="#F5B700" font-family="Inter, sans-serif" font-size="16" font-weight="700">Open Source</text>
+    <rect x="660" y="420" width="220" height="42" rx="21" fill="#12B5A6" fill-opacity="0.12" stroke="#12B5A6" stroke-width="1.5"/>
+    <text x="770" y="447" text-anchor="middle" fill="#12B5A6" font-family="Inter, sans-serif" font-size="16" font-weight="700">${escapeHtml(PRIMARY_HOST)}</text>
+  </svg>`;
+}
+
+/** Brand badge on event OG images: about 15px per letter at 18px bold with letter spacing. */
+export const OG_BADGE_TEXT = escapeHtml(BRAND_NAME.toUpperCase());
+const OG_BADGE_WIDTH = Math.max(168, BRAND_NAME.length * 15 + 48);
+
 export async function renderEventOgJpeg(item: any): Promise<Buffer> {
   await ensureFontConfigInitialized();
 
-  const [line1, line2] = wrapTitleLines(item.title || 'Kwegatta Event', 34);
+  const [line1, line2] = wrapTitleLines(item.title || `${BRAND_NAME} Event`, 34);
   const hasLine1 = Boolean(line1 && canInterRender(line1));
   const hasLine2 = Boolean(line2 && canInterRender(line2));
   const safeLine1 = hasLine1 ? escapeHtml(line1) : '';
@@ -5009,8 +5107,8 @@ export async function renderEventOgJpeg(item: any): Promise<Buffer> {
         </linearGradient>
       </defs>
       <rect width="1200" height="630" fill="url(#grad)"/>
-      <rect x="64" y="48" width="168" height="42" rx="10" fill="#070B12" fill-opacity="0.82" stroke="#F59E0B" stroke-width="1.5"/>
-      <text x="148" y="75" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">KWEGATTA</text>
+      <rect x="64" y="48" width="${OG_BADGE_WIDTH}" height="42" rx="10" fill="#070B12" fill-opacity="0.82" stroke="#F59E0B" stroke-width="1.5"/>
+      <text x="${64 + OG_BADGE_WIDTH / 2}" y="75" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">${OG_BADGE_TEXT}</text>
       ${hasLine1 ? `<text x="64" y="${titleY1}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine1}</text>` : ''}
       ${hasLine2 ? `<text x="64" y="${titleY2}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine2}</text>` : ''}
       ${hasMeta ? `<text x="64" y="${metaY}" fill="#F59E0B" font-family="Inter, sans-serif" font-size="24" font-weight="600">${safeMetaLine}</text>` : ''}
@@ -5037,8 +5135,8 @@ export async function renderEventOgJpeg(item: any): Promise<Buffer> {
       <rect width="1200" height="630" fill="url(#bg)"/>
       <circle cx="1060" cy="120" r="240" fill="#F59E0B" fill-opacity="0.08"/>
       <rect x="40" y="40" width="1120" height="550" rx="24" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2"/>
-      <rect x="72" y="72" width="168" height="42" rx="10" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.5"/>
-      <text x="156" y="99" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">KWEGATTA</text>
+      <rect x="72" y="72" width="${OG_BADGE_WIDTH}" height="42" rx="10" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.5"/>
+      <text x="${72 + OG_BADGE_WIDTH / 2}" y="99" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">${OG_BADGE_TEXT}</text>
       ${hasLine1 ? `<text x="72" y="${titleY1}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine1}</text>` : ''}
       ${hasLine2 ? `<text x="72" y="${titleY2}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine2}</text>` : ''}
       ${hasMeta ? `<text x="72" y="${metaY - 12}" fill="#F59E0B" font-family="Inter, sans-serif" font-size="24" font-weight="600">${safeMetaLine}</text>` : ''}
@@ -6034,7 +6132,7 @@ export function generateEventIcsContent(item: any): string {
   return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Kwegatta//Events//EN',
+    `PRODID:-//${BRAND_NAME}//Events//EN`,
     'BEGIN:VEVENT',
     `UID:${item.id}@kwegatta.ai.studio`,
     `DTSTAMP:${toIcsUtc(new Date().toISOString())}`,
@@ -6060,9 +6158,9 @@ let dailyEmailDateKey = '';
 let dailyEmailCount = 0;
 const DAILY_EMAIL_LIMIT = 400;
 
-export const EMAIL_FROM_NAME = 'Kwegatta Events';
+export const EMAIL_FROM_NAME = BRAND_EMAIL_FROM_NAME;
 
-/** "Kwegatta Events <user@host>", or '' when SMTP is not configured. */
+/** "Matchpiece Events <user@host>", or '' when SMTP is not configured. */
 export function buildEmailFrom(smtpUser: string): string {
   const user = String(smtpUser || '').trim();
   return user ? `"${EMAIL_FROM_NAME}" <${user}>` : '';
@@ -6135,18 +6233,18 @@ export function buildEventEmail(
     ? `Event cancelled: ${title}`
     : `Confirmation: ${title}`;
   const lead = kind === 'promotion'
-    ? `A spot opened up. You're now registered for "${title}" on Kwegatta.`
+    ? `A spot opened up. You're now registered for "${title}" on ${BRAND_NAME}.`
     : kind === 'cancelled'
-    ? `Your registration for "${title}" on Kwegatta has been cancelled. Your ticket is no longer valid.`
+    ? `Your registration for "${title}" on ${BRAND_NAME} has been cancelled. Your ticket is no longer valid.`
     : kind === 'event_cancelled'
-    ? `"${title}" on Kwegatta has been cancelled by ${removedBy === 'moderator' ? 'a moderator' : 'the organiser'}. ${onWaitlist ? 'You were on the waitlist, and the waitlist has been closed.' : 'Your registration and ticket are no longer valid.'}`
-    : `You are registered for "${title}" on Kwegatta.`;
+    ? `"${title}" on ${BRAND_NAME} has been cancelled by ${removedBy === 'moderator' ? 'a moderator' : 'the organiser'}. ${onWaitlist ? 'You were on the waitlist, and the waitlist has been closed.' : 'Your registration and ticket are no longer valid.'}`
+    : `You are registered for "${title}" on ${BRAND_NAME}.`;
   const placeText = isOnline
     ? `Online link: ${joinLink || 'Provided on event page'}`
     : `Venue: ${venue}`;
   const footer = onWaitlist
-    ? 'You received this because you joined the waitlist on Kwegatta. Reply to contact the organiser.'
-    : 'You received this because you registered on Kwegatta. Reply to contact the organiser.';
+    ? `You received this because you joined the waitlist on ${BRAND_NAME}. Reply to contact the organiser.`
+    : `You received this because you registered on ${BRAND_NAME}. Reply to contact the organiser.`;
 
   const text = [
     `Hi ${name},`,
@@ -6180,7 +6278,7 @@ export function buildEventEmail(
     '<body style="margin:0;padding:0;background:#f3f4f6;">',
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;"><tr><td align="center" style="padding:16px 8px;">',
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:#ffffff;border-radius:12px;font-family:Arial,Helvetica,sans-serif;">',
-    '<tr><td style="padding:20px 24px;border-bottom:1px solid #e5e7eb;"><span style="font-size:22px;font-weight:bold;color:#0f766e;letter-spacing:0.5px;">Kwegatta</span></td></tr>',
+    '<tr><td style="padding:20px 24px;border-bottom:1px solid #e5e7eb;"><span style="font-size:22px;font-weight:bold;color:#0f766e;letter-spacing:0.5px;">' + escapeHtml(BRAND_NAME) + '</span></td></tr>',
     '<tr><td style="padding:24px;">',
     `<p style="margin:0 0 12px;font-size:15px;color:#111827;">Hi ${e(name)},</p>`,
     `<p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.5;">${e(lead)}</p>`,
@@ -9476,7 +9574,7 @@ function checkLinkedProfileId(val: unknown): { ok: true; value: string | null } 
   if (val === null || val === undefined || String(val).trim() === '') return { ok: true, value: null };
   const id = String(val).trim();
   if (!store.profiles.some((p: any) => p.id === id)) {
-    return { ok: false, error: 'Linked Kwegatta profile was not found' };
+    return { ok: false, error: `Linked ${BRAND_NAME} profile was not found` };
   }
   return { ok: true, value: id };
 }
@@ -9778,7 +9876,7 @@ app.get('/api/team-photo/:id', (req: Request, res: Response) => {
    ========================================================================= */
 app.get('/robots.txt', (_req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  return res.send('User-agent: *\nAllow: /\nSitemap: https://kwegatta.ai.studio/sitemap.xml\n');
+  return res.send(`User-agent: *\nAllow: /\nSitemap: ${getPublicAppUrl()}/sitemap.xml\n`);
 });
 
 app.get('/sitemap.xml', (_req: Request, res: Response) => {
@@ -10939,7 +11037,7 @@ async function setupVite() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Kwegatta server listening on port ${PORT} (0.0.0.0)`);
+    console.log(`${BRAND_NAME} server listening on port ${PORT} (0.0.0.0)`);
     console.log(`Gemma Model: ${DEFAULT_OPEN_WEIGHT_MODEL}`);
     console.log(`Storage engine: ${storageMode.toUpperCase()}`);
   });

@@ -1,6 +1,6 @@
-# Kwegatta REST API Reference
+# Matchpiece REST API Reference
 
-The Kwegatta backend exposes a set of REST endpoints for member matchmaking, Gemma 4 open-weight AI inference, event networking, data synchronization, and administration.
+The Matchpiece backend exposes a set of REST endpoints for member matchmaking, Gemma 4 open-weight AI inference, event networking, data synchronization, and administration.
 
 ## Route Authorization Matrix
 

@@ -1,5 +1,5 @@
-// Kwegatta PWA Service Worker
-const CACHE_NAME = 'kwegatta-1.12.0';
+// Matchpiece PWA Service Worker
+const CACHE_NAME = 'matchpiece-1.13.0';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

@@ -19,6 +19,7 @@ import {
   formatAuthError
 } from '../services/firebase';
 import { Profile } from '../types';
+import { BRAND_NAME, PRIMARY_HOST } from '../lib/brand';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -216,7 +217,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       <div className="flex items-start justify-between">
         <div>
           <h3 id="auth-modal-title" className="text-lg sm:text-xl font-bold font-display text-[var(--fg)] tracking-tight">
-            {title || (existingProfile ? `Connect ${existingProfile.name.split(' ')[0]}'s Profile` : 'Sign in to Kwegatta')}
+            {title || (existingProfile ? `Connect ${existingProfile.name.split(' ')[0]}'s Profile` : `Sign in to ${BRAND_NAME}`)}
           </h3>
           <p className="text-xs text-[var(--fg-muted)] leading-relaxed mt-0.5">
             {subtitle || (existingProfile
@@ -264,7 +265,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <p className="leading-relaxed font-medium">{errorMsg}</p>
               {errorMsg.includes('unauthorized-domain') && (
                 <p className="text-[13px] text-[var(--fg-muted)]">
-                  Authorised domains for this app: <code className="text-[var(--gold-text)]">kwegatta.ai.studio</code> and the Cloud Run deployment domain.
+                  Authorised domains for this app: <code className="text-[var(--gold-text)]">{PRIMARY_HOST}</code> and the Cloud Run deployment domain.
                 </p>
               )}
             </div>

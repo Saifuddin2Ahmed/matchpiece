@@ -4,6 +4,7 @@ import { Profile } from '../types';
 import { Avatar } from './Avatar';
 import { BrandLogo } from './BrandLogo';
 import { ThemePreference } from '../utils';
+import { BRAND_NAME } from '../lib/brand';
 
 export const SIGNED_OUT_NAV_ITEMS = [
   { id: 'people', label: 'People' },
@@ -148,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => onNavigate(currentProfile ? 'home' : 'people')}
             className="flex shrink-0 whitespace-nowrap items-center gap-2.5 hover:opacity-90 active:scale-[0.98] transition-all focus-visible:ring-2 focus-visible:ring-[var(--gold)] rounded-lg p-0.5 cursor-pointer"
-            aria-label="Kwegatta Home"
+            aria-label={`${BRAND_NAME} Home`}
           >
             <BrandLogo size="md" showText={true} />
           </button>

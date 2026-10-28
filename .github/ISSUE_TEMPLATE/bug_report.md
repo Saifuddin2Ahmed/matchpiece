@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve Kwegatta
+about: Create a report to help us improve Matchpiece
 title: '[BUG] '
 labels: ['bug', 'triage']
 assignees: ''
@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 - Device: [e.g. iPhone 14, Android Tecno Spark, Laptop]
 - OS: [e.g. iOS, Android, Linux, macOS, Windows]
 - Browser: [e.g. Chrome, Safari, Firefox]
-- Kwegatta Version / Commit: [e.g. v0.1.1]
+- Matchpiece Version / Commit: [e.g. v0.1.1]
 
 ## Additional Context
 - Was Gemma 4 AI active or was the "Basic match (AI unavailable)" fallback displayed?

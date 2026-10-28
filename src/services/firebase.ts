@@ -17,6 +17,7 @@ import {
   User,
   AuthError
 } from 'firebase/auth';
+import { PRIMARY_HOST } from '../lib/brand';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCW0tukqDxhKmmk6IZxvtjMk7U49scZh5o",
@@ -220,7 +221,7 @@ export function formatAuthError(err: any): string {
     return 'This account has been disabled. Please contact support.';
   }
   if (code === 'auth/unauthorized-domain') {
-    return 'This preview domain is not in the Firebase authorized domains list. Sign-in works on kwegatta.ai.studio and the Cloud Run production URL.';
+    return `This preview domain is not in the Firebase authorized domains list. Sign-in works on ${PRIMARY_HOST} and the Cloud Run production URL.`;
   }
   if (code === 'auth/popup-blocked') {
     return 'Popup was blocked by your browser. Please allow popups or try again.';

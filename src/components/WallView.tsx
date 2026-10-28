@@ -4,6 +4,7 @@ import { Profile, Post } from '../types';
 import { db, PUBLIC_APP_URL } from '../services/api';
 import { generateQrCodeDataUrl, MIN_MEMBERS_FOR_STATS } from '../utils';
 import { BrandLogo } from './BrandLogo';
+import { BRAND_NAME } from '../lib/brand';
 
 const INITIAL_COLORS = [
   'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
@@ -116,7 +117,7 @@ export const WallView: React.FC<WallViewProps> = ({ onBack }) => {
             <div className="p-4 bg-white rounded-3xl shadow-2xl inline-block">
               <img
                 src={qrCodeUrl}
-                alt="Scan to join Kwegatta"
+                alt={`Scan to join ${BRAND_NAME}`}
                 className="w-64 h-64 sm:w-80 sm:h-80 mx-auto rounded-xl"
               />
             </div>

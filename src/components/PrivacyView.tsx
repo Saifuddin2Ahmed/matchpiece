@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Shield, Lock, Eye, Download, Trash2, Mail, ExternalLink } from 'lucide-react';
+import { BRAND_NAME } from '../lib/brand';
 
 interface PrivacyViewProps {
   onBack: () => void;
@@ -30,7 +31,7 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onBack }) => {
           Your Data, Your Control.
         </h1>
         <p className="text-sm text-[var(--fg-muted)] leading-relaxed max-w-2xl">
-          <strong>Kwegatta</strong> is committed to open contact, transparency, and data minimization, designed to be <strong>Aligned with the Digital Public Goods Standard</strong> (self-assessed independent open-source compliance; does not imply formal third-party certification or endorsement). This document details exactly what data is collected, why, where it is stored, who can see it, and how members retain complete sovereignty over their personal information. We record the date you accepted this policy when you create your profile.
+          <strong>{BRAND_NAME}</strong> is committed to open contact, transparency, and data minimization, designed to be <strong>Aligned with the Digital Public Goods Standard</strong> (self-assessed independent open-source compliance; does not imply formal third-party certification or endorsement). This document details exactly what data is collected, why, where it is stored, who can see it, and how members retain complete sovereignty over their personal information. We record the date you accepted this policy when you create your profile.
         </p>
       </div>
 
@@ -42,7 +43,7 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onBack }) => {
         </div>
         <div className="space-y-3 text-xs sm:text-sm text-[var(--fg-muted)] leading-relaxed">
           <p>
-            <strong className="text-[var(--fg)]">Open contact is the purpose of Kwegatta.</strong>
+            <strong className="text-[var(--fg)]">Open contact is the purpose of {BRAND_NAME}.</strong>
           </p>
           <ul className="list-disc pl-5 space-y-2">
             <li>
@@ -74,7 +75,7 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onBack }) => {
         </div>
         <div className="space-y-4 text-xs sm:text-sm text-[var(--fg-muted)] leading-relaxed">
           <p>
-            When you join Kwegatta, our conversational onboarding assistant collects only what is necessary to pair you with collaborators, mentors, and partners:
+            When you join {BRAND_NAME}, our conversational onboarding assistant collects only what is necessary to pair you with collaborators, mentors, and partners:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-[var(--bg-subtle)] border border-[var(--card-border)] space-y-1.5">

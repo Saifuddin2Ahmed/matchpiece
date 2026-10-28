@@ -1,5 +1,6 @@
 import { Profile } from './types';
 import { formatTzLabel } from './lib/timezoneLabel';
+import { BRAND_NAME, PRIMARY_URL } from './lib/brand';
 export { formatTzLabel };
 
 export function getInitials(name: string): string {
@@ -309,7 +310,7 @@ export function getPublicAppBaseUrl(): string {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return window.location.origin.replace(/\/$/, '');
   }
-  return 'https://kwegatta.ai.studio';
+  return PRIMARY_URL;
 }
 
 export function getPublicEventShareUrl(eventId: string): string {
@@ -348,7 +349,7 @@ export function generateIcsFile(event: {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Kwegatta//Event//EN',
+    `PRODID:-//${BRAND_NAME}//Event//EN`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',

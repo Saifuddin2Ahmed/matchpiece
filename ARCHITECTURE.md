@@ -1,6 +1,6 @@
 # System Architecture
 
-This document describes the architectural design, security boundaries, and data flows of **Kwegatta**, an open-source student matchmaking platform aligned with the **Digital Public Goods Standard**.
+This document describes the architectural design, security boundaries, and data flows of **Matchpiece**, an open-source student matchmaking platform aligned with the **Digital Public Goods Standard**.
 
 ---
 

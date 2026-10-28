@@ -4,6 +4,7 @@ import { NotificationItem, Profile } from '../types';
 import { formatTimeAgo, formatWhatsAppUrl } from '../utils';
 import { Avatar } from './Avatar';
 import { resolveNotificationTarget } from '../lib/notificationTarget';
+import { BRAND_NAME } from '../lib/brand';
 
 interface NotificationModalProps {
   notification: NotificationItem | null;
@@ -87,7 +88,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
 
   if (!notification) return null;
 
-  const senderName = sender?.name || 'Kwegatta Network';
+  const senderName = sender?.name || `${BRAND_NAME} Network`;
   const senderHeadline = sender?.headline || '';
   const canWhatsApp = Boolean(
     sender &&
@@ -97,7 +98,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   );
 
   const whatsAppUrl = canWhatsApp && sender?.whatsapp
-    ? formatWhatsAppUrl(sender.whatsapp, `Hi ${sender.name.split(' ')[0] || ''}! I received your connection message on Kwegatta.`)
+    ? formatWhatsAppUrl(sender.whatsapp, `Hi ${sender.name.split(' ')[0] || ''}! I received your connection message on ${BRAND_NAME}.`)
     : '';
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -1,12 +1,12 @@
 # Project Governance
 
-**Kwegatta** is an open-source initiative dedicated to fostering student innovation and peer learning across universities and tech hubs in Uganda and East Africa. It is governed as a community-driven open-source project aligned with the **Digital Public Goods Standard**.
+**Matchpiece** is an open-source initiative dedicated to fostering student innovation and peer learning across universities and tech hubs in Uganda and East Africa. It is governed as a community-driven open-source project aligned with the **Digital Public Goods Standard**.
 
 ---
 
 ## 1. Project Ownership
 
-Kwegatta is not owned by any single corporation. The codebase and documentation are published under the permissive **MIT License**, ensuring permanent community access, transparency, and freedom to fork, study, and improve the software.
+Matchpiece is not owned by any single corporation. The codebase and documentation are published under the permissive **MIT License**, ensuring permanent community access, transparency, and freedom to fork, study, and improve the software.
 
 * **Project Leads**:
   * **Saifuddin Ahmed** — Lead Maintainer & Systems Engineer
@@ -40,7 +40,7 @@ We actively mentor and welcome contributors from student builder communities int
 2. **Reviewer**: Consistently helps review community pull requests, tests edge cases, and provides helpful, constructive feedback.
 3. **Core Maintainer**:
    * Has contributed multiple sustained pull requests (features, documentation, or infrastructure).
-   * Demonstrates a deep understanding of Kwegatta's architecture, Primer UI standards, and open-weight model constraints.
+   * Demonstrates a deep understanding of Matchpiece's architecture, Primer UI standards, and open-weight model constraints.
    * Upholds the Contributor Covenant Code of Conduct.
    * Existing maintainers vote to extend maintainer privileges with commit access.
 
