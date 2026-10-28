@@ -196,7 +196,7 @@ describe('Share pages and OG images', () => {
     const svg = buildDefaultOgSvg();
     expect(svg).toContain('>MATCHPIECE</text>');
     expect(svg).toContain(`>${BRAND_TAGLINE}</text>`);
-    expect(svg).toContain('Formerly Kwegatta');
+    expect(svg).not.toMatch(/Kwegatta|matchmaking/i);
     expect(svg).toContain('matchpiece.ai.studio');
   });
 

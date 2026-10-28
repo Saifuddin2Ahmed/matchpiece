@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Matchpiece",
   "short_name": "Matchpiece",
-  "description": "Find your missing piece. Matchpiece (formerly Kwegatta) matches students and builders by what they need and offer using the open-weight Gemma 4 model.",
+  "description": "Find teammates, mentors and study partners. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

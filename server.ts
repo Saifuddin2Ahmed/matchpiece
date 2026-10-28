@@ -20,7 +20,7 @@ import { validateTeamPayload, checkPhotoDataUrl, checkX, checkWebsite, whatsappL
 import { getEffectiveStartMs, getEffectiveEndMs, getOpportunityDeadlineMs, sortForTab, findRecentDuplicate } from './src/lib/eventTiming';
 import { withHttps } from './src/lib/links';
 import { markGroup } from './src/lib/brandMark';
-import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_FORMERLY, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
+import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_AUDIENCE, BRAND_AWARD_SHORT, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -4865,7 +4865,7 @@ export function isEventPubliclyVisible(item: any): boolean {
   return true;
 }
 
-export const OG_RENDER_VERSION = '4';
+export const OG_RENDER_VERSION = '5';
 
 export function computeEventOgVersionHash(item: any): string {
   const raw = `v${OG_RENDER_VERSION}|${item?.cover_image || ''}|${item?.title || ''}|${item?.starts_at || item?.datetime || ''}`;
@@ -5062,38 +5062,19 @@ export function canInterRender(text: string): boolean {
 }
 
 /**
- * Default share image (public/og-image.png), rendered by scripts/render-og-image.ts.
- * Same layout as before; only the name and wording come from src/lib/brand.ts.
+ * Default share image (public/og-image.png), rendered by scripts/render-brand-images.ts.
+ * Large text so it still reads in small chat previews; wording from src/lib/brand.ts.
  */
 export function buildDefaultOgSvg(): string {
-  const mark = `<g transform="translate(64 115) scale(0.8)">
-      <path d="M 210 120 C 138.2 120 80 178.2 80 250 C 80 321.8 138.2 380 210 380 C 265.4 380 312.4 345.3 330.8 296 L 277.2 280.8 C 265.4 309.8 239.8 330 210 330 C 165.8 330 130 294.2 130 250 C 130 205.8 165.8 170 210 170 C 239.8 170 265.4 190.2 277.2 219.2 L 330.8 204 C 312.4 154.7 265.4 120 210 120 Z" fill="#F5B700"/>
-      <path d="M 302 120 C 246.6 120 199.6 154.7 181.2 204 L 234.8 219.2 C 246.6 190.2 272.2 170 302 170 C 346.2 170 382 205.8 382 250 C 382 294.2 346.2 330 302 330 C 272.2 330 246.6 309.8 234.8 280.8 L 181.2 296 C 199.6 345.3 246.6 380 302 380 C 373.8 380 432 321.8 432 250 C 432 178.2 373.8 120 302 120 Z" fill="#12B5A6"/>
-      <path d="M 234.8 219.2 C 246.6 190.2 272.2 170 302 170 C 314.5 170 326.2 173.6 336 179.8 L 362 135.2 C 344.2 125.5 323.8 120 302 120 C 246.6 120 199.6 154.7 181.2 204 L 234.8 219.2 Z" fill="#12B5A6"/>
-    </g>`;
+  const e = escapeHtml;
   return `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#070B12"/>
-        <stop offset="60%" stop-color="#0E1525"/>
-        <stop offset="100%" stop-color="#1A160B"/>
-      </linearGradient>
-      <radialGradient id="glow" cx="0.75" cy="0.25" r="0.45">
-        <stop offset="0%" stop-color="#F5B700" stop-opacity="0.22"/>
-        <stop offset="100%" stop-color="#F5B700" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <rect width="1200" height="630" fill="url(#bg)"/>
-    <rect width="1200" height="630" fill="url(#glow)"/>
-    <rect x="24" y="24" width="1152" height="582" rx="20" fill="none" stroke="#F5B700" stroke-opacity="0.3" stroke-width="2"/>
-    ${mark}
-    <text x="460" y="242" fill="#F5B700" font-family="Inter, sans-serif" font-size="64" font-weight="800" letter-spacing="3">${escapeHtml(BRAND_NAME.toUpperCase())}</text>
-    <text x="460" y="306" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="30" font-weight="700">${escapeHtml(BRAND_TAGLINE)}</text>
-    <text x="460" y="362" fill="#94A3B8" font-family="Inter, sans-serif" font-size="20">${escapeHtml(`Formerly ${BRAND_FORMERLY} · matchmaking powered by open-weight Gemma 4`)}</text>
-    <rect x="460" y="420" width="180" height="42" rx="21" fill="#F5B700" fill-opacity="0.12" stroke="#F5B700" stroke-width="1.5"/>
-    <text x="550" y="447" text-anchor="middle" fill="#F5B700" font-family="Inter, sans-serif" font-size="16" font-weight="700">Open Source</text>
-    <rect x="660" y="420" width="220" height="42" rx="21" fill="#12B5A6" fill-opacity="0.12" stroke="#12B5A6" stroke-width="1.5"/>
-    <text x="770" y="447" text-anchor="middle" fill="#12B5A6" font-family="Inter, sans-serif" font-size="16" font-weight="700">${escapeHtml(PRIMARY_HOST)}</text>
+    ${ogBackgroundSvg()}
+    ${markGroup(80, 64, 120)}
+    <text x="222" y="152" fill="#F5B700" font-family="Inter, sans-serif" font-size="68" font-weight="800" letter-spacing="4">${e(BRAND_NAME.toUpperCase())}</text>
+    <text x="80" y="300" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="64" font-weight="800">${e(BRAND_TAGLINE)}</text>
+    <text x="80" y="372" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="40" font-weight="600">${e(BRAND_AUDIENCE)}</text>
+    <text x="80" y="468" fill="#F5B700" font-family="Inter, sans-serif" font-size="34" font-weight="600">${e(BRAND_AWARD_SHORT)}</text>
+    <text x="80" y="552" fill="#2DD4BF" font-family="Inter, sans-serif" font-size="36" font-weight="700">${e(PRIMARY_HOST)}</text>
   </svg>`;
 }
 
@@ -5118,93 +5099,80 @@ export function ogBackgroundSvg(): string {
 /** Small mark and MATCHPIECE wordmark, top-left of a share image (x, y = top-left of the mark). */
 export function ogHeaderSvg(x: number, y: number): string {
   return `${markGroup(x, y, 64)}
-    <text x="${x + 78}" y="${y + 44}" fill="#F5B700" font-family="Inter, sans-serif" font-size="32" font-weight="800" letter-spacing="3">${escapeHtml(BRAND_NAME.toUpperCase())}</text>`;
+    <text x="${x + 78}" y="${y + 44}" fill="#F5B700" font-family="Inter, sans-serif" font-size="32" font-weight="800" letter-spacing="3">${OG_BADGE_TEXT}</text>`;
 }
 
-/** Brand badge on event OG images: about 15px per letter at 18px bold with letter spacing. */
+/** Wordmark text on share images. */
 export const OG_BADGE_TEXT = escapeHtml(BRAND_NAME.toUpperCase());
-const OG_BADGE_WIDTH = Math.max(168, BRAND_NAME.length * 15 + 48);
 
 export async function renderEventOgJpeg(item: any): Promise<Buffer> {
   await ensureFontConfigInitialized();
+  const e = escapeHtml;
 
-  const [line1, line2] = wrapTitleLines(item.title || `${BRAND_NAME} Event`, 34);
-  const hasLine1 = Boolean(line1 && canInterRender(line1));
-  const hasLine2 = Boolean(line2 && canInterRender(line2));
-  const safeLine1 = hasLine1 ? escapeHtml(line1) : '';
-  const safeLine2 = hasLine2 && line2 ? escapeHtml(line2) : '';
+  const [line1, line2] = wrapTitleLines(item.title || `${BRAND_NAME} Event`, 32);
+  const titleLines = [line1, line2].filter((l): l is string => Boolean(l && canInterRender(l)));
 
   const { dateTimeText, tz } = formatEventOgDatePart(item);
   const venuePart =
     item?.format === 'online'
       ? 'Online'
       : stripControlChars(item?.venue || item?.location || 'Kampala') || 'Kampala';
-  const rawMetaLine = `${dateTimeText} (${tz}) · ${venuePart}`;
-  const hasMeta = canInterRender(rawMetaLine);
-  const safeMetaLine = hasMeta
-    ? escapeHtml(rawMetaLine.length > 76 ? rawMetaLine.slice(0, 75) + '…' : rawMetaLine)
-    : '';
+  const dateLine = `${dateTimeText} (${tz})`;
+  const venueLine = venuePart.length > 52 ? venuePart.slice(0, 51).trimEnd() + '…' : venuePart;
+  const showDate = canInterRender(dateLine);
+  const showVenue = canInterRender(venueLine);
 
   const coverBuf = resolveCoverImageBuffer(item.cover_image);
+  const textBlock = (titleY: number) => {
+    const out: string[] = [];
+    let y = titleY;
+    for (const line of titleLines) {
+      out.push(`<text x="80" y="${y}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="56" font-weight="800">${e(line)}</text>`);
+      y += 66;
+    }
+    y += 4;
+    if (showDate) {
+      out.push(`<text x="80" y="${y}" fill="#F5B700" font-family="Inter, sans-serif" font-size="34" font-weight="600">${e(dateLine)}</text>`);
+      y += 48;
+    }
+    if (showVenue) out.push(`<text x="80" y="${y}" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="34" font-weight="500">${e(venueLine)}</text>`);
+    return out.join('\n      ');
+  };
 
-  const titleY1 = hasLine2 ? 450 : 495;
-  const titleY2 = 510;
-  const metaY = hasLine1 ? 568 : 520;
-
+  let out: Buffer;
   if (coverBuf) {
     const overlaySvg = `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#070B12" stop-opacity="0.18"/>
-          <stop offset="45%" stop-color="#070B12" stop-opacity="0.55"/>
-          <stop offset="100%" stop-color="#070B12" stop-opacity="0.95"/>
+          <stop offset="0%" stop-color="#070B12" stop-opacity="0.45"/>
+          <stop offset="40%" stop-color="#070B12" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#070B12" stop-opacity="0.96"/>
         </linearGradient>
       </defs>
       <rect width="1200" height="630" fill="url(#grad)"/>
-      <rect x="64" y="48" width="${OG_BADGE_WIDTH}" height="42" rx="10" fill="#070B12" fill-opacity="0.82" stroke="#F59E0B" stroke-width="1.5"/>
-      <text x="${64 + OG_BADGE_WIDTH / 2}" y="75" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">${OG_BADGE_TEXT}</text>
-      ${hasLine1 ? `<text x="64" y="${titleY1}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine1}</text>` : ''}
-      ${hasLine2 ? `<text x="64" y="${titleY2}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine2}</text>` : ''}
-      ${hasMeta ? `<text x="64" y="${metaY}" fill="#F59E0B" font-family="Inter, sans-serif" font-size="24" font-weight="600">${safeMetaLine}</text>` : ''}
+      <rect x="56" y="44" width="380" height="88" rx="16" fill="#070B12" fill-opacity="0.72"/>
+      ${ogHeaderSvg(76, 56)}
+      <text x="1136" y="100" text-anchor="end" fill="#2DD4BF" font-family="Inter, sans-serif" font-size="28" font-weight="700">${e(PRIMARY_HOST)}</text>
+      ${textBlock(titleLines.length > 1 ? 400 : 440)}
     </svg>`;
-
-    const baseImage = sharp(coverBuf)
+    out = await sharp(coverBuf)
       .resize(1200, 630, { fit: 'cover', position: 'attention' })
-      .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }]);
-
-    let out = await baseImage.jpeg({ quality: 80 }).toBuffer();
-    if (out.length > 300 * 1024) {
-      out = await sharp(out).jpeg({ quality: 65 }).toBuffer();
-    }
-    return out;
-  } else {
-    const brandSvg = `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#070B12"/>
-          <stop offset="60%" stop-color="#0E1525"/>
-          <stop offset="100%" stop-color="#1A160B"/>
-        </linearGradient>
-      </defs>
-      <rect width="1200" height="630" fill="url(#bg)"/>
-      <circle cx="1060" cy="120" r="240" fill="#F59E0B" fill-opacity="0.08"/>
-      <rect x="40" y="40" width="1120" height="550" rx="24" fill="none" stroke="#F59E0B" stroke-opacity="0.3" stroke-width="2"/>
-      <rect x="72" y="72" width="${OG_BADGE_WIDTH}" height="42" rx="10" fill="#F59E0B" fill-opacity="0.15" stroke="#F59E0B" stroke-width="1.5"/>
-      <text x="${72 + OG_BADGE_WIDTH / 2}" y="99" text-anchor="middle" fill="#F59E0B" font-family="Inter, sans-serif" font-size="18" font-weight="800" letter-spacing="2">${OG_BADGE_TEXT}</text>
-      ${hasLine1 ? `<text x="72" y="${titleY1}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine1}</text>` : ''}
-      ${hasLine2 ? `<text x="72" y="${titleY2}" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="48" font-weight="800">${safeLine2}</text>` : ''}
-      ${hasMeta ? `<text x="72" y="${metaY - 12}" fill="#F59E0B" font-family="Inter, sans-serif" font-size="24" font-weight="600">${safeMetaLine}</text>` : ''}
-    </svg>`;
-
-    let out = await sharp(Buffer.from(brandSvg))
-      .resize(1200, 630)
+      .composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
       .jpeg({ quality: 80 })
       .toBuffer();
-    if (out.length > 300 * 1024) {
-      out = await sharp(out).jpeg({ quality: 65 }).toBuffer();
-    }
-    return out;
+  } else {
+    const brandSvg = `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+      ${ogBackgroundSvg()}
+      ${ogHeaderSvg(80, 62)}
+      ${textBlock(titleLines.length > 1 ? 250 : 280)}
+      <text x="80" y="568" fill="#2DD4BF" font-family="Inter, sans-serif" font-size="34" font-weight="700">${e(PRIMARY_HOST)}</text>
+    </svg>`;
+    out = await sharp(Buffer.from(brandSvg)).resize(1200, 630).jpeg({ quality: 80 }).toBuffer();
   }
+  if (out.length > 300 * 1024) {
+    out = await sharp(out).jpeg({ quality: 65 }).toBuffer();
+  }
+  return out;
 }
 
 app.get('/og/event/:id.jpg', async (req: Request, res: Response) => {

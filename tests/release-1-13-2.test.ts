@@ -11,9 +11,11 @@ import {
   profileShareText,
   profileOgBadges,
   scrubContactInfo,
-  setIndexHtmlTemplateForTest
+  setIndexHtmlTemplateForTest,
+  buildDefaultOgSvg,
+  buildProfileOgSvg
 } from '../server';
-import { applyBrandToHtml, profileShareUrl } from '../src/lib/brand';
+import { applyBrandToHtml, profileShareUrl, BRAND_DESCRIPTION } from '../src/lib/brand';
 import { parseAppRoute } from '../src/lib/route';
 
 let server: any;
@@ -222,5 +224,46 @@ describe('In-app routes', () => {
     expect(parseAppRoute('#/events/ev1', '/')).toEqual({ main: 'events', sub: 'ev1' });
     expect(parseAppRoute('', '/about')).toEqual({ main: 'about', sub: undefined });
     expect(parseAppRoute('', '/')).toEqual({ main: 'home', sub: undefined });
+  });
+});
+
+describe('Default share card and meta', () => {
+  const DESCRIPTION = 'Find teammates, mentors and study partners. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.';
+
+  it('default meta has no "Kwegatta" and no "matchmaking", and uses the new description', async () => {
+    expect(BRAND_DESCRIPTION).toBe(DESCRIPTION);
+    const html = (await request('GET', '/u/no-such-profile-1132')).body.toString();
+    const head = html.slice(0, html.indexOf('</head>'));
+    const metaAndTitle = [...head.matchAll(/<meta [^>]*>|<title>[^<]*<\/title>|<script type="application\/ld\+json">[\s\S]*?<\/script>/g)].map(m => m[0]).join('\n');
+    expect(metaAndTitle).not.toMatch(/kwegatta|matchmaking/i);
+    expect(head).toContain(`<meta name="description" content="${DESCRIPTION}" />`);
+    expect(head).toContain(`<meta property="og:description" content="${DESCRIPTION}" />`);
+    expect(head).toContain(`<meta name="twitter:description" content="${DESCRIPTION}" />`);
+    const manifest = JSON.parse(fs.readFileSync('public/manifest.webmanifest', 'utf-8'));
+    expect(JSON.stringify([manifest.name, manifest.short_name, manifest.description])).not.toMatch(/kwegatta|matchmaking/i);
+  });
+
+  it('the default share image has the new lines, large text and no pills', () => {
+    const svg = buildDefaultOgSvg();
+    for (const line of ['>MATCHPIECE<', '>Find your missing piece<', '>Teammates · Mentors · Study partners<', '>1st place · Hacktoberfest Hack Day Kampala 2026<', '>matchpiece.ai.studio<']) {
+      expect(svg).toContain(line);
+    }
+    expect(svg).not.toMatch(/Kwegatta|matchmaking|Open Source/i);
+    expect(svg).not.toMatch(/rx="21"/);
+    const sizes = [...svg.matchAll(/font-size="(\d+)"/g)].map(m => Number(m[1]));
+    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(34);
+  });
+
+  it('public/og-image.png is 1200x630', async () => {
+    const meta = await sharp('public/og-image.png').metadata();
+    expect([meta.width, meta.height]).toEqual([1200, 630]);
+  });
+
+  it('profile share image text is at least 34px apart from the name', () => {
+    const svg = buildProfileOgSvg({ id: 'x', name: 'Ann Lee', headline: 'Designer' }, false);
+    const sizes = [...svg.matchAll(/font-size="(\d+)"/g)].map(m => Number(m[1]));
+    expect(Math.min(...sizes)).toBeGreaterThanOrEqual(32);
+    expect(svg).toContain('>Ann Lee<');
+    expect(svg).toContain('>AL<');
   });
 });

@@ -1,5 +1,5 @@
 // Renders public/og-image.png (the default share image) from buildDefaultOgSvg().
-// Run after changing the brand name or tagline: NODE_ENV=test VITEST=1 npx tsx scripts/render-og-image.ts
+// Run after changing the brand name or tagline: NODE_ENV=test VITEST=1 npx tsx scripts/render-brand-images.ts
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';

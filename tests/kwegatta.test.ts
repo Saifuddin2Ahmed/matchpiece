@@ -6325,7 +6325,7 @@ describe('Release 1.5.0 Features', () => {
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {
-        expect(OG_RENDER_VERSION).toBe('4');
+        expect(OG_RENDER_VERSION).toBe('5');
         const hash = computeEventOgVersionHash({ title: 'Test', starts_at: '2026-10-15T00:00:00Z' });
         expect(hash).toBeDefined();
         expect(typeof hash).toBe('string');
