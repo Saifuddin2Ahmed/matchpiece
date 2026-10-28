@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use Matchpiece, please cite it as below."
+title: "Matchpiece: find teammates, mentors and study partners"
+type: software
+license: MIT
+repository-code: "https://github.com/Saifuddin2Ahmed/matchpiece"
+url: "https://matchpiece.ai.studio"
+keywords: [matchmaking, education, open-source AI, Gemma, hackathon, Uganda]
+authors:
+  - given-names: Saifuddin
+    family-names: Ahmed
+    orcid: "https://orcid.org/0009-0007-9719-7258"
+    affiliation: "Birtal Lab"
+  - given-names: Abubaker Mohamed
+    family-names: Adam
+  - given-names: Adinan
+    family-names: Juuko
+  - given-names: Amme Patience
+    family-names: Esther
+  - given-names: Mupole Uwizeye
+    family-names: Alexis
+  - given-names: Nabagulanyi Prossy
+    family-names: Sherry
+  - given-names: Ojambo
+    family-names: Emmanuel
+version: "1.0.0"
+date-released: "2026-10-28"
