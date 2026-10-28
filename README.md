@@ -272,5 +272,5 @@ We extend our sincere thanks to:
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE) (Copyright (c) 2026 The Kwegatta Team).  
+This project is licensed under the [MIT License](LICENSE) (Copyright (c) 2026 The Matchpiece Team (formerly Kwegatta)).  
 The underlying open-weight model **Gemma 4** is developed by Google DeepMind and licensed under [Apache 2.0](https://ai.google.dev/gemma/docs/core).

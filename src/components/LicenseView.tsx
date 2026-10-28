@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Scale, Github, ExternalLink } from 'lucide-react';
-import { BRAND_NAME } from '../lib/brand';
+import { BRAND_NAME, LICENSE_HOLDER } from '../lib/brand';
 
 interface LicenseViewProps {
   onBack: () => void;
@@ -38,7 +38,7 @@ export const LicenseView: React.FC<LicenseViewProps> = ({ onBack }) => {
       {/* License Body */}
       <div className="kw-card p-6 sm:p-8 bg-[var(--card)] border border-[var(--card-border)] rounded-2xl font-mono text-xs text-[var(--fg)] leading-relaxed shadow-sm space-y-4">
         <p className="font-bold text-sm text-[var(--gold-text)]">
-          Copyright (c) 2026 The Kwegatta Team
+          Copyright (c) 2026 {LICENSE_HOLDER}
         </p>
         <p>
           Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -23,6 +23,8 @@ export const LEGACY_HOST = 'kwegatta.ai.studio';
 export const EMAIL_FROM_NAME = `${BRAND_NAME} Events`;
 export const AWARD_LINE = `${BRAND_WITH_FORMERLY} won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS.`;
 export const COPYRIGHT_LINE = `© 2026 ${BRAND_NAME} · formerly ${BRAND_FORMERLY}`;
+/** Copyright holder in LICENSE. */
+export const LICENSE_HOLDER = `The ${BRAND_NAME} Team (formerly ${BRAND_FORMERLY})`;
 
 /** Lowercase slug for downloaded file names. */
 export const BRAND_SLUG = BRAND_NAME.toLowerCase();

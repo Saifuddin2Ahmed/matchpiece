@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi, beforeEach, onTestFinished } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -57,8 +57,10 @@ import {
   computeEventOgVersionHash,
   injectEventOgIntoHtml,
   computeEventPhase,
-  store
+  store,
+  setIndexHtmlTemplateForTest
 } from '../server';
+import { applyBrandToHtml } from '../src/lib/brand';
 import { validatePasswordStrength } from '../src/services/firebase';
 import { normalizeIntent, parseIntents, toggleChoice, makeFirst } from '../src/lib/profileChoices';
 import { ShareCardModal, avatarSrc } from '../src/components/ShareCardModal';
@@ -339,13 +341,13 @@ describe('Member-Submitted Events & Approval Permissions', () => {
 });
 
 describe('Service Worker & Cache-Control Configuration (PWA v1.5.2)', () => {
-  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.0 and handles cache strategies correctly', async () => {
+  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.1 and handles cache strategies correctly', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const swContent = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf-8');
 
-    // 1. Cache name includes version matchpiece-1.13.0
-    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.0'");
+    // 1. Cache name includes version matchpiece-1.13.1
+    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.1'");
 
     // 2. Skip waiting and clients claim are preserved
     expect(swContent).toContain('self.skipWaiting()');
@@ -2202,6 +2204,9 @@ describe('Release 1.5.0 Features', () => {
       };
 
       let updatedProfileState: any = null;
+      // No server here: the save succeeds and echoes the patch back
+      const saveSpy = vi.spyOn(apiModule.db, 'updateOrThrow').mockImplementation(async (_c: string, _id: string, patch: any) => patch);
+      onTestFinished(() => saveSpy.mockRestore());
 
       await act(async () => {
         render(
@@ -2336,6 +2341,9 @@ describe('Release 1.5.0 Features', () => {
         };
 
         let updatedProfileState: any = null;
+        // No server here: the save succeeds and echoes the patch back
+        const saveSpy = vi.spyOn(apiModule.db, 'updateOrThrow').mockImplementation(async (_c: string, _id: string, patch: any) => patch);
+        onTestFinished(() => saveSpy.mockRestore());
 
         await act(async () => {
           render(
@@ -2757,6 +2765,9 @@ describe('Release 1.5.0 Features', () => {
         };
 
         let updatedProfileState: any = null;
+        // No server here: the save succeeds and echoes the patch back
+        const saveSpy = vi.spyOn(apiModule.db, 'updateOrThrow').mockImplementation(async (_c: string, _id: string, patch: any) => patch);
+        onTestFinished(() => saveSpy.mockRestore());
 
         await act(async () => {
           render(
@@ -5740,6 +5751,10 @@ describe('Release 1.5.0 Features', () => {
           } as any
         );
 
+        // Use the current index.html, not whatever older build may sit in dist/ (tests run before the build)
+        setIndexHtmlTemplateForTest(applyBrandToHtml(fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8')));
+        onTestFinished(() => setIndexHtmlTemplateForTest(null));
+
         // 1. Public event
         const resPub = await fetch(`${baseUrl}/e/${pubId}`);
         expect(resPub.status).toBe(200);
@@ -6305,8 +6320,8 @@ describe('Release 1.5.0 Features', () => {
         const swCacheName = match![1];
 
         expect(swCacheName).toBe(`matchpiece-${pkg.version}`);
-        expect(pkg.version).toBe('1.13.0');
-        expect(swCacheName).toBe('matchpiece-1.13.0');
+        expect(pkg.version).toBe('1.13.1');
+        expect(swCacheName).toBe('matchpiece-1.13.1');
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {

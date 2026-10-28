@@ -1,5 +1,5 @@
 // Matchpiece PWA Service Worker
-const CACHE_NAME = 'matchpiece-1.13.0';
+const CACHE_NAME = 'matchpiece-1.13.1';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

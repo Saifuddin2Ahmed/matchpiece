@@ -1019,6 +1019,19 @@ export const db = {
     }
   },
 
+  /** Like update, but throws when the server does not save, so the caller never reports a failed save as done. */
+  async updateOrThrow<T>(collection: string, id: string, patch: Partial<T>): Promise<T> {
+    await getFreshAuthToken();
+    const headers = getAuthHeaders({ 'Content-Type': 'application/json' });
+    const res = await fetch(`/api/data/${collection}/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(patch)
+    });
+    if (!res.ok) throw new Error(`Failed to update ${collection}/${id}`);
+    return res.json();
+  },
+
   async remove(collection: string, id: string): Promise<boolean> {
     try {
       await getFreshAuthToken();

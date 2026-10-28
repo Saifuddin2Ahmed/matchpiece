@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { LINK_ERROR, PROFILE_LINK_KEYS, PROFILE_LINK_RULES, checkLink, withHttps, type ProfileLinkKey } from '../lib/links';
 import { useDialogA11y } from '../hooks/useDialogA11y';
 import {
   Sparkles,
@@ -63,6 +64,16 @@ interface ProfileViewProps {
   onDeleteProfile?: () => void;
   onSignOut?: () => void;
   onToast: (msg: string) => void;
+}
+
+function linksFromProfile(p: Profile): Record<ProfileLinkKey, string> {
+  return Object.fromEntries(PROFILE_LINK_KEYS.map(k => [k, String((p as any)[k] || '')])) as Record<ProfileLinkKey, string>;
+}
+
+function customLinksFromProfile(p: Profile): CustomLink[] {
+  return Array.isArray(p.custom_links)
+    ? p.custom_links.slice(0, 3).map(c => ({ label: c.label || '', url: c.url || '' }))
+    : [];
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -153,32 +164,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     return parseIntents(profile.intent);
   });
 
-  useEffect(() => {
-    setEditHeadline(profile.headline || '');
-    setEditBio(profile.bio || '');
-    setEditOffers(profile.offers || '');
-    setEditNeeds(profile.needs || '');
-    setEditTeaches(profile.teaches || '');
-    setEditLearns(profile.learns || '');
-    setEditStatus(profile.status || 'Open to projects');
-    setEditWhatsApp(profile.whatsapp || '');
-    setEditHideWhatsApp(profile.hide_whatsapp || false);
-    setEditNotifyNewEvents(profile.notify_new_events || 'all');
-    setEditCountry(profile.country || '');
-    setEditCity(
-      profile.city
-        ? profile.city
-        : (!profile.country && profile.location)
-        ? profile.location
-        : ''
-    );
-    const initialRoles = (Array.isArray(profile.roles) && profile.roles.length > 0)
-      ? profile.roles.filter(r => ROLE_CHOICES.includes(r)).slice(0, 2)
-      : (profile.role && ROLE_CHOICES.includes(profile.role) ? [profile.role] : ['Developer']);
-    setEditRoles(initialRoles.length > 0 ? initialRoles : ['Developer']);
-    setEditStage(profile.stage && STAGE_CHOICES.includes(profile.stage) ? profile.stage : '');
-    setEditIntents(parseIntents(profile.intent));
-  }, [profile]);
 
   const handleToggleRole = (r: string) => {
     setEditRoles(prev => toggleChoice(prev, r, 2));
@@ -189,27 +174,85 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   };
 
   // Social & Academic links edit state
-  const [editLinkedin, setEditLinkedin] = useState(profile.linkedin || '');
+  const [editLinks, setEditLinks] = useState<Record<ProfileLinkKey, string>>(() => linksFromProfile(profile));
   const [editGithub, setEditGithub] = useState(profile.github || '');
-  const [editWebsite, setEditWebsite] = useState(profile.website || '');
-  const [editTwitter, setEditTwitter] = useState(profile.twitter || '');
-  const [editFacebook, setEditFacebook] = useState(profile.facebook || '');
-  const [editTiktok, setEditTiktok] = useState(profile.tiktok || '');
-  const [editInstagram, setEditInstagram] = useState(profile.instagram || '');
-  const [editYoutube, setEditYoutube] = useState(profile.youtube || '');
-  const [editScholar, setEditScholar] = useState(profile.scholar || '');
-  const [editOrcid, setEditOrcid] = useState(profile.orcid || '');
-  const [editHuggingface, setEditHuggingface] = useState(profile.huggingface || '');
-  const [editKaggle, setEditKaggle] = useState(profile.kaggle || '');
-  const [editGitlab, setEditGitlab] = useState(profile.gitlab || '');
-  const [editGooglePlay, setEditGooglePlay] = useState(profile.google_play || '');
-  const [editGoogleDev, setEditGoogleDev] = useState(profile.google_dev || '');
-  const [editIeee, setEditIeee] = useState(profile.ieee || '');
-  const [editCustomLinks, setEditCustomLinks] = useState<CustomLink[]>(() => {
-    return Array.isArray(profile.custom_links)
-      ? profile.custom_links.slice(0, 3).map(c => ({ label: c.label || '', url: c.url || '' }))
-      : [];
+  const [editCustomLinks, setEditCustomLinks] = useState<CustomLink[]>(() => customLinksFromProfile(profile));
+  // Inline link errors, keyed by link field or `custom-<index>`
+  const [linkErrors, setLinkErrors] = useState<Record<string, string>>({});
+
+  /** Fills every edit field from a profile. */
+  const loadEditForm = (p: Profile) => {
+    setEditHeadline(p.headline || '');
+    setEditBio(p.bio || '');
+    setEditOffers(p.offers || '');
+    setEditNeeds(p.needs || '');
+    setEditTeaches(p.teaches || '');
+    setEditLearns(p.learns || '');
+    setEditStatus(p.status || 'Open to projects');
+    setEditWhatsApp(p.whatsapp || '');
+    setEditHideWhatsApp(p.hide_whatsapp || false);
+    setEditNotifyNewEvents(p.notify_new_events || 'all');
+    setEditCountry(p.country || '');
+    setEditCity(
+      p.city
+        ? p.city
+        : (!p.country && p.location)
+        ? p.location
+        : ''
+    );
+    const initialRoles = (Array.isArray(p.roles) && p.roles.length > 0)
+      ? p.roles.filter(r => ROLE_CHOICES.includes(r)).slice(0, 2)
+      : (p.role && ROLE_CHOICES.includes(p.role) ? [p.role] : ['Developer']);
+    setEditRoles(initialRoles.length > 0 ? initialRoles : ['Developer']);
+    setEditStage(p.stage && STAGE_CHOICES.includes(p.stage) ? p.stage : '');
+    setEditIntents(parseIntents(p.intent));
+    setEditGithub(p.github || '');
+    setEditLinks(linksFromProfile(p));
+    setEditCustomLinks(customLinksFromProfile(p));
+    setLinkErrors({});
+  };
+
+  // The form is filled when it opens, when another profile is shown and after a save.
+  // While it is open, background profile updates never overwrite what the member is typing.
+  const isEditingRef = useRef(isEditing);
+  isEditingRef.current = isEditing;
+  const formProfileIdRef = useRef(profile.id);
+  useEffect(() => {
+    if (formProfileIdRef.current !== profile.id) {
+      formProfileIdRef.current = profile.id;
+      isEditingRef.current = false;
+      setIsEditing(false);
+      loadEditForm(profile);
+      return;
+    }
+    if (!isEditingRef.current) loadEditForm(profile);
+  }, [profile]);
+
+  const openEditor = () => {
+    loadEditForm(profile);
+    setIsEditing(true);
+  };
+  const closeEditor = () => {
+    setIsEditing(false);
+    loadEditForm(profile);
+  };
+
+  const setLink = (key: ProfileLinkKey, value: string) => {
+    setEditLinks(prev => ({ ...prev, [key]: value }));
+    if (linkErrors[key]) setLinkErrors(prev => ({ ...prev, [key]: '' }));
+  };
+  /** Props for a link input: adds https:// to a bare domain when the field loses focus. */
+  const linkField = (key: ProfileLinkKey) => ({
+    value: editLinks[key],
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => setLink(key, e.target.value),
+    onBlur: () => setLink(key, withHttps(editLinks[key])),
+    'aria-invalid': linkErrors[key] ? true : undefined,
+    'aria-describedby': linkErrors[key] ? `profile-${key}-error` : undefined
   });
+  const linkError = (id: string, key: string) =>
+    linkErrors[key] ? (
+      <p id={id} role="alert" className="text-xs text-rose-500 mt-1">{linkErrors[key]}</p>
+    ) : null;
 
   const [gemmaInstruction, setGemmaInstruction] = useState('');
   const [isRewriting, setIsRewriting] = useState(false);
@@ -274,6 +317,30 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       onToast('Pick at least one role');
       return;
     }
+
+    // Links: add https:// to bare domains, and stop with an inline error on anything still invalid
+    const errors: Record<string, string> = {};
+    const links = {} as Record<ProfileLinkKey, string>;
+    for (const key of PROFILE_LINK_KEYS) {
+      const { value, error } = checkLink(editLinks[key], PROFILE_LINK_RULES[key]);
+      links[key] = value;
+      if (error) errors[key] = error;
+    }
+    const customLinks = editCustomLinks.map((c, i) => {
+      const label = c.label.trim().slice(0, 24);
+      const { value, error } = checkLink(c.url, { httpsOnly: true });
+      if (error) errors[`custom-${i}`] = error;
+      else if (value && !label) errors[`custom-${i}`] = 'Add a label for this link';
+      return { label, url: value };
+    });
+    setEditLinks(links);
+    setEditCustomLinks(customLinks);
+    setLinkErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      onToast('Check the highlighted links. Nothing was saved.');
+      return;
+    }
+
     try {
       const cleanCity = editCity.trim().slice(0, 100);
       const cleanCountry = editCountry;
@@ -296,42 +363,36 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         whatsapp: editWhatsApp.replace(/[^\d+]/g, ''),
         hide_whatsapp: editHideWhatsApp,
         notify_new_events: editNotifyNewEvents,
-        linkedin: editLinkedin.trim(),
+        ...links,
         github: editGithub.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/$/, ''),
-        website: editWebsite.trim(),
-        twitter: editTwitter.trim(),
-        facebook: editFacebook.trim(),
-        tiktok: editTiktok.trim(),
-        instagram: editInstagram.trim(),
-        youtube: editYoutube.trim(),
-        scholar: editScholar.trim(),
-        orcid: editOrcid.trim(),
-        huggingface: editHuggingface.trim(),
-        kaggle: editKaggle.trim(),
-        gitlab: editGitlab.trim(),
-        google_play: editGooglePlay.trim(),
-        google_dev: editGoogleDev.trim(),
-        ieee: editIeee.trim(),
-        custom_links: editCustomLinks
-          .map(c => ({ label: c.label.trim().slice(0, 24), url: c.url.trim() }))
-          .filter(c => c.label && /^https:\/\/[^\s]+$/i.test(c.url))
-          .slice(0, 3)
+        custom_links: customLinks.filter(c => c.label && c.url).slice(0, 3)
       };
 
-      const res = await db.update('profiles', profile.id, payload);
+      const res = await db.updateOrThrow<Profile>('profiles', profile.id, payload);
+      const saved: Record<string, any> = res && typeof res === 'object' ? res : {};
       const savedProfile: Profile = {
         ...profile,
         ...payload,
         role: finalRoles[0],
         roles: finalRoles,
-        ...(res && typeof res === 'object' ? res : {}),
+        ...saved,
         avatar: profile.avatar
       };
-      onUpdateProfile(savedProfile);
+      // The server may still refuse a link: say so and keep the form open instead of reporting success
+      const refused = PROFILE_LINK_KEYS.filter(k => links[k] && k in saved && !saved[k]);
+      if (refused.length > 0) {
+        onUpdateProfile(savedProfile);
+        setLinkErrors(Object.fromEntries(refused.map(k => [k, LINK_ERROR])));
+        onToast('Some links were not saved. Check the highlighted links.');
+        return;
+      }
+      loadEditForm(savedProfile);
+      isEditingRef.current = false;
       setIsEditing(false);
+      onUpdateProfile(savedProfile);
       onToast('Profile updated successfully');
     } catch (err) {
-      onToast('Failed to save profile changes');
+      onToast('Failed to save profile changes. Your edits are still in the form.');
     }
   };
 
@@ -800,7 +861,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <div className="space-y-2">
                 <div className="flex gap-2 items-center">
                   <button
-                    onClick={() => setIsEditing(!isEditing)}
+                    onClick={() => (isEditing ? closeEditor() : openEditor())}
                     className="primer-btn text-xs py-1.5 flex-1"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -1556,10 +1617,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-linkedin"
                           type="text"
                           placeholder="https://linkedin.com/in/username"
-                          value={editLinkedin}
-                          onChange={e => setEditLinkedin(e.target.value)}
+                          {...linkField('linkedin')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'linkedin'}-error`, 'linkedin')}
                       </div>
                       <div>
                         <label htmlFor="profile-github" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">GitHub</label>
@@ -1578,20 +1639,20 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-gitlab"
                           type="text"
                           placeholder="https://gitlab.com/username"
-                          value={editGitlab}
-                          onChange={e => setEditGitlab(e.target.value)}
+                          {...linkField('gitlab')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'gitlab'}-error`, 'gitlab')}
                       </div>
                       <div>
                         <label className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Google Play Developer (play.google.com)</label>
                         <input
                           type="text"
                           placeholder="https://play.google.com/store/apps/dev?id=..."
-                          value={editGooglePlay}
-                          onChange={e => setEditGooglePlay(e.target.value)}
+                          {...linkField('google_play')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'google_play'}-error`, 'google_play')}
                       </div>
                       <div>
                         <label htmlFor="profile-google-dev" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Google Developer Profile (g.dev)</label>
@@ -1599,10 +1660,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-google-dev"
                           type="text"
                           placeholder="https://g.dev/username"
-                          value={editGoogleDev}
-                          onChange={e => setEditGoogleDev(e.target.value)}
+                          {...linkField('google_dev')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'google_dev'}-error`, 'google_dev')}
                       </div>
                       <div>
                         <label htmlFor="profile-website" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Personal Website</label>
@@ -1610,10 +1671,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-website"
                           type="text"
                           placeholder="https://yoursite.com"
-                          value={editWebsite}
-                          onChange={e => setEditWebsite(e.target.value)}
+                          {...linkField('website')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'website'}-error`, 'website')}
                       </div>
                     </div>
                   </div>
@@ -1630,10 +1691,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-twitter"
                           type="text"
                           placeholder="https://x.com/username"
-                          value={editTwitter}
-                          onChange={e => setEditTwitter(e.target.value)}
+                          {...linkField('twitter')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'twitter'}-error`, 'twitter')}
                       </div>
                       <div>
                         <label htmlFor="profile-facebook" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Facebook</label>
@@ -1641,10 +1702,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-facebook"
                           type="text"
                           placeholder="https://facebook.com/username"
-                          value={editFacebook}
-                          onChange={e => setEditFacebook(e.target.value)}
+                          {...linkField('facebook')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'facebook'}-error`, 'facebook')}
                       </div>
                       <div>
                         <label htmlFor="profile-instagram" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Instagram</label>
@@ -1652,10 +1713,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-instagram"
                           type="text"
                           placeholder="https://instagram.com/username"
-                          value={editInstagram}
-                          onChange={e => setEditInstagram(e.target.value)}
+                          {...linkField('instagram')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'instagram'}-error`, 'instagram')}
                       </div>
                       <div>
                         <label htmlFor="profile-tiktok" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">TikTok</label>
@@ -1663,10 +1724,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-tiktok"
                           type="text"
                           placeholder="https://tiktok.com/@username"
-                          value={editTiktok}
-                          onChange={e => setEditTiktok(e.target.value)}
+                          {...linkField('tiktok')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'tiktok'}-error`, 'tiktok')}
                       </div>
                       <div>
                         <label htmlFor="profile-youtube" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">YouTube</label>
@@ -1674,10 +1735,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-youtube"
                           type="text"
                           placeholder="https://youtube.com/@channel"
-                          value={editYoutube}
-                          onChange={e => setEditYoutube(e.target.value)}
+                          {...linkField('youtube')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'youtube'}-error`, 'youtube')}
                       </div>
                     </div>
                   </div>
@@ -1694,10 +1755,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-scholar"
                           type="text"
                           placeholder="https://scholar.google.com/citations?user=..."
-                          value={editScholar}
-                          onChange={e => setEditScholar(e.target.value)}
+                          {...linkField('scholar')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'scholar'}-error`, 'scholar')}
                       </div>
                       <div>
                         <label htmlFor="profile-orcid" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">ORCID</label>
@@ -1705,10 +1766,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-orcid"
                           type="text"
                           placeholder="https://orcid.org/0000-0000-0000-0000"
-                          value={editOrcid}
-                          onChange={e => setEditOrcid(e.target.value)}
+                          {...linkField('orcid')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'orcid'}-error`, 'orcid')}
                       </div>
                       <div>
                         <label htmlFor="profile-ieee" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">IEEE Collabratec (ieee-collabratec.ieee.org)</label>
@@ -1716,10 +1777,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-ieee"
                           type="text"
                           placeholder="https://ieee-collabratec.ieee.org/app/p/..."
-                          value={editIeee}
-                          onChange={e => setEditIeee(e.target.value)}
+                          {...linkField('ieee')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'ieee'}-error`, 'ieee')}
                       </div>
                       <div>
                         <label htmlFor="profile-huggingface" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Hugging Face (huggingface.co)</label>
@@ -1727,10 +1788,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-huggingface"
                           type="text"
                           placeholder="https://huggingface.co/username"
-                          value={editHuggingface}
-                          onChange={e => setEditHuggingface(e.target.value)}
+                          {...linkField('huggingface')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'huggingface'}-error`, 'huggingface')}
                       </div>
                       <div>
                         <label htmlFor="profile-kaggle" className="text-[13px] text-[var(--fg-muted)] block mb-0.5">Kaggle (kaggle.com)</label>
@@ -1738,10 +1799,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           id="profile-kaggle"
                           type="text"
                           placeholder="https://kaggle.com/username"
-                          value={editKaggle}
-                          onChange={e => setEditKaggle(e.target.value)}
+                          {...linkField('kaggle')}
                           className="primer-input text-xs w-full"
                         />
+                        {linkError(`profile-${'kaggle'}-error`, 'kaggle')}
                       </div>
                     </div>
                   </div>
@@ -1793,19 +1854,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                                 const next = [...editCustomLinks];
                                 next[index] = { ...next[index], url: e.target.value };
                                 setEditCustomLinks(next);
+                                if (linkErrors[`custom-${index}`]) setLinkErrors(prev => ({ ...prev, [`custom-${index}`]: '' }));
                               }}
+                              onBlur={() => {
+                                const next = [...editCustomLinks];
+                                next[index] = { ...next[index], url: withHttps(next[index].url) };
+                                setEditCustomLinks(next);
+                              }}
+                              aria-invalid={linkErrors[`custom-${index}`] ? true : undefined}
+                              aria-describedby={linkErrors[`custom-${index}`] ? `profile-custom-${index}-error` : undefined}
                               className="primer-input text-xs flex-1 w-full"
                             />
                             <button
                               type="button"
                               onClick={() => {
                                 setEditCustomLinks(editCustomLinks.filter((_, i) => i !== index));
+                                setLinkErrors({});
                               }}
                               className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 cursor-pointer self-end sm:self-center"
                               title="Remove link"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
+                            {linkError(`profile-custom-${index}-error`, `custom-${index}`)}
                           </div>
                         ))}
                       </div>
@@ -1874,7 +1945,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 )}
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
+                  onClick={closeEditor}
                   className="primer-btn text-xs py-1.5 px-3 cursor-pointer"
                 >
                   Cancel

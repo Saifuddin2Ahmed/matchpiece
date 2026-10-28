@@ -4,6 +4,17 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.1] - 2026-10-28
+
+### Fixed
+- Editing your profile no longer loses what you type. Before, the form was refilled with your saved profile whenever the app refreshed it in the background, so text you were typing could disappear unless you saved quickly. The form now fills in when you open it, keeps your edits while it is open, and shows your saved profile after you save. Cancel drops unsaved edits.
+- Website and other profile links now accept a plain address such as "otwox.com" and save it as "https://otwox.com". The form adds "https://" when you leave the field, and the server does the same.
+- A link that is still not valid shows a message under the field ("Enter a full link, e.g. https://example.com") and nothing is saved. Fields for one site, such as Kaggle or Hugging Face, say which site they expect. Custom links need a label and an https:// address.
+- "Profile updated successfully" is only shown when the save worked. If the save fails, the form stays open with your text and says so.
+
+### Changed
+- The licence now names "The Matchpiece Team (formerly Kwegatta)" as the copyright holder.
+
 ## [1.13.0] - 2026-10-28
 
 ### Changed

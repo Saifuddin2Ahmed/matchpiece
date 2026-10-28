@@ -18,6 +18,7 @@ import { formatTzLabel } from './src/lib/timezoneLabel';
 import { validateEventTitle } from './src/lib/eventTitle';
 import { validateTeamPayload, checkPhotoDataUrl, checkX, checkWebsite, whatsappLink, TEAM_VISIBILITY_FLAGS } from './src/lib/teamFields';
 import { getEffectiveStartMs, getEffectiveEndMs, getOpportunityDeadlineMs, sortForTab, findRecentDuplicate } from './src/lib/eventTiming';
+import { withHttps } from './src/lib/links';
 import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_FORMERLY, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -966,7 +967,8 @@ function sanitizeText(val: any, maxLength = 500): string {
 
 function sanitizeUrl(val: any): string {
   if (typeof val !== 'string') return '';
-  const trimmed = val.trim();
+  // A bare domain ("otwox.com") is saved as https://otwox.com
+  const trimmed = withHttps(val);
   if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) {
     return trimmed.slice(0, 500);
   }
@@ -1005,7 +1007,7 @@ export function sanitizeCustomLinks(arr: any): Array<{ label: string; url: strin
     if (results.length >= 3) break;
     if (!item || typeof item !== 'object') continue;
     const label = sanitizeText(item.label, 24);
-    const rawUrl = typeof item.url === 'string' ? item.url.trim() : '';
+    const rawUrl = withHttps(item.url);
     if (label && /^https:\/\/[^\s]+$/i.test(rawUrl)) {
       results.push({ label, url: rawUrl.slice(0, 500) });
     }
@@ -4807,6 +4809,11 @@ try {
     cachedIndexHtmlTemplate = applyBrandToHtml(fs.readFileSync(rootIdx, 'utf-8'));
   }
 } catch (_) {}
+
+/** Tests: pin the page template so results do not depend on an older dist/ build. null reloads it from disk. */
+export function setIndexHtmlTemplateForTest(html: string | null): void {
+  cachedIndexHtmlTemplate = html;
+}
 
 function getIndexHtmlTemplate(): string {
   const isDev = process.env.NODE_ENV === 'development';
