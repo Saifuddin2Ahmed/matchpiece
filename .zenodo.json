@@ -1,0 +1,19 @@
+{
+  "title": "Matchpiece: find teammates, mentors and study partners",
+  "upload_type": "software",
+  "description": "<p>Matchpiece is an open-source web app that helps students and builders find teammates, mentors and study partners, using open-weight AI (Gemma) for matching. First place, Hacktoberfest 2026 Hack Day Kampala × MUBS.</p>",
+  "license": "MIT",
+  "keywords": ["matchmaking", "education", "open-source AI", "Gemma", "hackathon", "Uganda"],
+  "creators": [
+    {"name": "Ahmed, Saifuddin", "orcid": "0009-0007-9719-7258", "affiliation": "Birtal Lab"},
+    {"name": "Adam, Abubaker Mohamed"},
+    {"name": "Juuko, Adinan"},
+    {"name": "Esther, Amme Patience"},
+    {"name": "Alexis, Mupole Uwizeye"},
+    {"name": "Sherry, Nabagulanyi Prossy"},
+    {"name": "Emmanuel, Ojambo"}
+  ],
+  "related_identifiers": [
+    {"identifier": "https://matchpiece.ai.studio", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}
