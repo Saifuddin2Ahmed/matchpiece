@@ -28,6 +28,8 @@ export const LEGACY_HOST = 'kwegatta.ai.studio';
 export const REPO_URL = 'https://github.com/Saifuddin2Ahmed/matchpiece';
 
 export const EMAIL_FROM_NAME = `${BRAND_NAME} Events`;
+/** Public contact address for conduct, security and privacy reports. */
+export const CONTACT_EMAIL = 'events@matchpiece.tech';
 export const AWARD_LINE = `${BRAND_WITH_FORMERLY} won 1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS.`;
 export const COPYRIGHT_LINE = `© 2026 ${BRAND_NAME} · formerly ${BRAND_FORMERLY}`;
 /** Copyright holder in LICENSE. */

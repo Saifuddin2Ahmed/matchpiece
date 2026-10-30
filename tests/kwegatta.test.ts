@@ -219,7 +219,7 @@ describe('Profile Sanitiser (Privacy & Safety)', () => {
     expect(sanitized.account_uid).toBeUndefined();
     expect(sanitized.blocked_ids).toBeUndefined();
     expect(sanitized.name).toBe('Brian Okello');
-    expect(sanitized.avatar).toBe('/api/avatar/user-brian-123');
+    expect(sanitized.avatar).toMatch(/^\/api\/avatar\/user-brian-123\?v=[0-9a-f]{10}$/);
   });
 
   it('preserves email, account_uid, and blocked_ids for the profile owner (self)', () => {
@@ -341,13 +341,13 @@ describe('Member-Submitted Events & Approval Permissions', () => {
 });
 
 describe('Service Worker & Cache-Control Configuration (PWA v1.5.2)', () => {
-  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.3 and handles cache strategies correctly', async () => {
+  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.4 and handles cache strategies correctly', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const swContent = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf-8');
 
-    // 1. Cache name includes version matchpiece-1.13.3
-    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.3'");
+    // 1. Cache name includes version matchpiece-1.13.4
+    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.4'");
 
     // 2. Skip waiting and clients claim are preserved
     expect(swContent).toContain('self.skipWaiting()');
@@ -4765,7 +4765,7 @@ describe('Release 1.5.0 Features', () => {
         const prevPass = process.env.SMTP_PASS;
 
         try {
-          process.env.SMTP_USER = 'events@kwegatta.org';
+          process.env.SMTP_USER = 'events@matchpiece.tech';
           process.env.SMTP_PASS = 'app-password-test';
           setMailSenderForTest(async (mailOpts: any) => {
             sentEmails.push(mailOpts);
@@ -4774,8 +4774,8 @@ describe('Release 1.5.0 Features', () => {
           const hostId = 'host-180-email';
           const memberId = 'att-180-email';
           store.profiles.push(
-            { id: hostId, account_uid: hostId, name: 'Email Host', headline: 'Host', email: 'host@kwegatta.org' } as any,
-            { id: memberId, account_uid: memberId, name: 'Email Member', headline: 'Dev', email: 'attendee@kwegatta.org' } as any
+            { id: hostId, account_uid: hostId, name: 'Email Host', headline: 'Host', email: 'host@example.org' } as any,
+            { id: memberId, account_uid: memberId, name: 'Email Member', headline: 'Dev', email: 'attendee@example.org' } as any
           );
 
           const now = Date.now();
@@ -4791,7 +4791,7 @@ describe('Release 1.5.0 Features', () => {
               starts_at: new Date(now + 3600000).toISOString(),
               ends_at: new Date(now + 7200000).toISOString(),
               timezone: 'Africa/Kampala',
-              contact_email: 'host@kwegatta.org'
+              contact_email: 'host@example.org'
             })
           });
           const ev = (await evRes.json()).item;
@@ -4802,8 +4802,8 @@ describe('Release 1.5.0 Features', () => {
           });
 
           expect(sentEmails.length).toBe(1);
-          expect(sentEmails[0].to).toBe('attendee@kwegatta.org');
-          expect(sentEmails[0].replyTo).toBe('host@kwegatta.org');
+          expect(sentEmails[0].to).toBe('attendee@example.org');
+          expect(sentEmails[0].replyTo).toBe('host@example.org');
           expect(sentEmails[0].text).toContain(`#/events/${ev.id}/ticket`);
           expect(sentEmails[0].attachments).toBeUndefined();
           expect(sentEmails[0].text).toContain('/calendar.ics');
@@ -6298,8 +6298,8 @@ describe('Release 1.5.0 Features', () => {
           expect(injectedHtml).not.toContain('https://kwegatta-359429599502.us-west1.run.app');
 
           // If PUBLIC_SHARE_URL is provided, it should respect it with trailing slashes stripped
-          process.env.PUBLIC_SHARE_URL = 'https://custom.kwegatta.org///';
-          expect(getPublicAppUrl()).toBe('https://custom.kwegatta.org');
+          process.env.PUBLIC_SHARE_URL = 'https://custom.example.org///';
+          expect(getPublicAppUrl()).toBe('https://custom.example.org');
         } finally {
           if (origAppUrl !== undefined) process.env.APP_URL = origAppUrl;
           else delete process.env.APP_URL;
@@ -6320,8 +6320,8 @@ describe('Release 1.5.0 Features', () => {
         const swCacheName = match![1];
 
         expect(swCacheName).toBe(`matchpiece-${pkg.version}`);
-        expect(pkg.version).toBe('1.13.3');
-        expect(swCacheName).toBe('matchpiece-1.13.3');
+        expect(pkg.version).toBe('1.13.4');
+        expect(swCacheName).toBe('matchpiece-1.13.4');
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {

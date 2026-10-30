@@ -443,8 +443,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       URL.revokeObjectURL(tempUrl);
       setPhotoPreviewUrl(resized);
 
-      const updated: Profile = { ...profile, avatar: resized };
-      await db.update('profiles', profile.id, { avatar: resized });
+      const saved = await db.updateOrThrow<Profile>('profiles', profile.id, { avatar: resized });
+      // The server answers with the new versioned photo URL; use it so every view shows the new photo at once
+      const updated: Profile = {
+        ...profile,
+        avatar: saved?.avatar || resized,
+        ...(saved?.avatar_url ? { avatar_url: saved.avatar_url } : {})
+      };
       onUpdateProfile(updated);
       setPhotoStatus('saved');
       onToast('Photo saved');

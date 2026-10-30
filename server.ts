@@ -1032,6 +1032,25 @@ function sanitizeAvatar(val: any): string {
   return '';
 }
 
+/** Short hash of a profile's photo; the initials stand in when there is no photo. */
+export function avatarVersion(p: any): string {
+  const avatar = String(p?.avatar || '');
+  const basis = avatar ? `a:${avatar}` : `i:${String(p?.name || '?').charAt(0).toUpperCase()}`;
+  return crypto.createHash('sha256').update(basis).digest('hex').slice(0, 10);
+}
+
+/** Versioned photo URL: it changes whenever the photo changes, so it can be cached for good. */
+export function avatarUrlFor(p: any): string {
+  return `/api/avatar/${encodeURIComponent(String(p?.id || ''))}?v=${avatarVersion(p)}`;
+}
+
+/** Photo value for payloads: stored photos become the versioned URL, outside https links stay as they are. */
+export function publicAvatar(p: any): string {
+  const avatar = String(p?.avatar || '');
+  if (!avatar) return '';
+  return avatar.startsWith('data:') ? avatarUrlFor(p) : avatar;
+}
+
 function resolveAvatar(incoming: any, existing: string = ''): string {
   if (incoming === undefined) return existing;
   if (typeof incoming === 'string' && incoming.trim().startsWith('/api/avatar/')) {
@@ -1070,7 +1089,8 @@ export function sanitizePublicProfile(p: any, callerAuthUid: string | null, isAd
     ...(isSelf ? { notify_new_events: getNewEventNotifyChoice(p) } : {}),
     ...(canSeeEmail && account_uid ? { account_uid } : {}),
     ...(isSelf && blocked_ids ? { blocked_ids } : {}),
-    avatar: p.avatar && p.avatar.startsWith('data:') ? `/api/avatar/${p.id}` : (p.avatar || ''),
+    avatar: publicAvatar(p),
+    avatar_url: avatarUrlFor(p),
     whatsapp: canSeeWhatsApp ? (p.whatsapp || '') : '',
     has_whatsapp: Boolean(p.whatsapp && String(p.whatsapp).trim().length > 0),
     hide_whatsapp: Boolean(p.hide_whatsapp),
@@ -4550,22 +4570,28 @@ app.get(['/api/health/status', '/healthz'], (_req: Request, res: Response) => {
   });
 });
 
-// Avatar Photo Endpoint with Cache-Control and ETag
+// Avatar photo endpoint. The versioned URL (?v=<photo hash>) is cached for good; any other URL
+// must be revalidated every time (no-cache + ETag, 304 when unchanged).
 app.get('/api/avatar/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const profile = store.profiles.find((p: any) => p.id === id);
+  const version = avatarVersion(profile || { id });
+  const isCurrentVersion = typeof req.query.v === 'string' && req.query.v === version;
+  const setCaching = (etag: string) => {
+    res.setHeader('Cache-Control', isCurrentVersion ? 'public, max-age=31536000, immutable' : 'no-cache');
+    res.setHeader('ETag', etag);
+  };
 
   if (!profile || !profile.avatar) {
     const name = profile?.name || '?';
     const initial = name.charAt(0).toUpperCase();
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" rx="64" fill="#1e293b"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#F0F3F6" font-family="Inter, sans-serif" font-size="52" font-weight="bold">${escapeHtml(initial)}</text></svg>`;
-    const etag = `W/"svg-${id}-${initial}"`;
+    const etag = `W/"svg-${version}"`;
+    setCaching(etag);
     if (req.headers['if-none-match'] === etag) {
       return res.status(304).end();
     }
     res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
-    res.setHeader('ETag', etag);
     return res.send(svg);
   }
 
@@ -4574,21 +4600,17 @@ app.get('/api/avatar/:id', (req: Request, res: Response) => {
     const match = avatar.match(/^data:([^;]+);base64,(.+)$/);
     if (match) {
       const mimeType = match[1];
-      const buffer = Buffer.from(match[2], 'base64');
-      const hash = crypto.createHash('md5').update(buffer).digest('hex');
-      const etag = `"${hash}"`;
-
+      const etag = `"${version}"`;
+      setCaching(etag);
       if (req.headers['if-none-match'] === etag) {
         return res.status(304).end();
       }
-
       res.setHeader('Content-Type', mimeType);
-      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
-      res.setHeader('ETag', etag);
-      return res.send(buffer);
+      return res.send(Buffer.from(match[2], 'base64'));
     }
   } else if (/^https:\/\/[^/]/i.test(avatar)) {
     // Only https photo links (e.g. Google account photos); never plain http.
+    setCaching(`"${version}"`);
     return res.redirect(avatar);
   }
 
@@ -5284,8 +5306,7 @@ export function profileOgBadges(p: any): string[] {
 
 export function computeProfileOgVersionHash(p: any): string {
   const { name, headline } = profileShareText(p);
-  const avatar = String(p?.avatar || '');
-  const raw = `v${OG_RENDER_VERSION}|${p?.updated_at || ''}|${name}|${headline}|${avatar.length}:${avatar.slice(-24)}|${profileOgBadges(p).join(',')}`;
+  const raw = `v${OG_RENDER_VERSION}|${p?.updated_at || ''}|${name}|${headline}|${avatarVersion(p)}|${profileOgBadges(p).join(',')}`;
   return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 10);
 }
 
@@ -6492,10 +6513,34 @@ const DAILY_EMAIL_LIMIT = 400;
 
 export const EMAIL_FROM_NAME = BRAND_EMAIL_FROM_NAME;
 
-/** "Matchpiece Events <user@host>", or '' when SMTP is not configured. */
-export function buildEmailFrom(smtpUser: string): string {
-  const user = String(smtpUser || '').trim();
-  return user ? `"${EMAIL_FROM_NAME}" <${user}>` : '';
+/**
+ * "Matchpiece Events <address>": EMAIL_FROM when set (a separate sender, e.g. a Brevo domain),
+ * otherwise the SMTP login. '' when neither is configured.
+ */
+export function buildEmailFrom(smtpUser: string, emailFrom: string = process.env.EMAIL_FROM || ''): string {
+  const address = String(emailFrom || '').trim() || String(smtpUser || '').trim();
+  return address ? `"${EMAIL_FROM_NAME}" <${address}>` : '';
+}
+
+/** Domain for Message-ID: the From address's domain, or the primary host when it has none. */
+export function messageIdDomain(from: string): string {
+  const match = String(from || '').match(/@([A-Za-z0-9.-]+)>?\s*$/);
+  const domain = match ? match[1].toLowerCase().replace(/^\.+|\.+$/g, '') : '';
+  return domain || PRIMARY_HOST;
+}
+
+/** SMTP connection settings: port 465 uses TLS from the start, 587 (and others) upgrade with STARTTLS. */
+export function smtpTransportOptions(
+  host: string = process.env.SMTP_HOST || '',
+  port: number = Number(process.env.SMTP_PORT) || 465
+): { host: string; port: number; secure: boolean; requireTLS: boolean } {
+  const secure = port === 465;
+  return {
+    host: String(host || '').trim() || 'smtp.gmail.com',
+    port,
+    secure,
+    requireTLS: !secure
+  };
 }
 
 /** Short reason for logs: error code or message with any address or secret removed. */
@@ -6678,22 +6723,19 @@ async function deliverEventEmail(mailOptions: any): Promise<boolean> {
     return false;
   }
 
+  const from = buildEmailFrom(smtpUser);
   const fullOptions = {
     ...mailOptions,
-    from: buildEmailFrom(smtpUser),
+    from,
     replyTo: String(mailOptions.replyTo || '').trim() || smtpUser,
-    messageId: `<${crypto.randomUUID()}@${PRIMARY_HOST}>`
+    messageId: `<${crypto.randomUUID()}@${messageIdDomain(from)}>`
   };
   try {
     if (isTestEnv() && testMailSender) {
       await testMailSender(fullOptions);
     } else {
-      const smtpHost = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com';
-      const smtpPort = Number(process.env.SMTP_PORT) || 465;
       const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: smtpPort === 465,
+        ...smtpTransportOptions(),
         auth: {
           user: smtpUser,
           pass: smtpPass
@@ -6926,7 +6968,7 @@ function buildWaitlistDetails(item: any): any[] {
         type: 'member',
         id: prof?.id || entry.id,
         name: prof?.name || 'Member',
-        avatar: prof ? `/api/avatar/${prof.id}` : undefined,
+        avatar: prof ? avatarUrlFor(prof) : undefined,
         role: prof?.role,
         headline: prof?.headline,
         created_at: entry.timestamp
@@ -7003,7 +7045,7 @@ app.get('/api/events/:id', (req: Request, res: Response) => {
         return {
           id: p.id,
           name: p.name,
-          avatar: `/api/avatar/${p.id}`,
+          avatar: avatarUrlFor(p),
           role: p.role,
           headline: p.headline,
           type: 'member',
@@ -7046,7 +7088,7 @@ app.get('/api/events/:id', (req: Request, res: Response) => {
           profile: {
             id: c.id,
             name: c.name,
-            avatar: `/api/avatar/${c.id}`,
+            avatar: avatarUrlFor(c),
             role: c.role,
             headline: c.headline
           },
@@ -7149,7 +7191,7 @@ app.get('/api/events/:id/attendees', (req: Request, res: Response) => {
     .map((p: any) => ({
       id: p.id,
       name: p.name,
-      avatar: `/api/avatar/${p.id}`,
+      avatar: avatarUrlFor(p),
       role: p.role,
       headline: p.headline,
       type: 'member',
@@ -9644,7 +9686,7 @@ app.get('/api/events/:id/people-to-meet', async (req: Request, res: Response) =>
             resultPeople.push({
               id: candObj.candidate.id,
               name: candObj.candidate.name || 'Member',
-              avatar: candObj.candidate.avatar || '',
+              avatar: publicAvatar(candObj.candidate),
               role: candObj.candidate.role || 'Member',
               headline: candObj.candidate.headline || '',
               reason: m.reason || candObj.reason,
@@ -9663,7 +9705,7 @@ app.get('/api/events/:id/people-to-meet', async (req: Request, res: Response) =>
     resultPeople = top10.slice(0, 5).map(t => ({
       id: t.candidate.id,
       name: t.candidate.name || 'Member',
-      avatar: t.candidate.avatar || '',
+      avatar: publicAvatar(t.candidate),
       role: t.candidate.role || 'Member',
       headline: t.candidate.headline || '',
       reason: t.reason,
@@ -9842,7 +9884,7 @@ function linkedProfileFor(m: any): { profile: any; avatarUrl: string | null } {
   if (!lp) return { profile: null, avatarUrl: null };
   return {
     profile: { id: lp.id, name: lp.name, role: lp.role, headline: lp.headline },
-    avatarUrl: lp.avatar ? `/api/avatar/${lp.id}` : null
+    avatarUrl: lp.avatar ? avatarUrlFor(lp) : null
   };
 }
 
@@ -10009,7 +10051,7 @@ app.get('/api/admin/team/profile-search', (req: Request, res: Response) => {
       id: p.id,
       name: p.name,
       headline: p.headline || '',
-      avatar_url: p.avatar ? `/api/avatar/${p.id}` : null
+      avatar_url: p.avatar ? avatarUrlFor(p) : null
     }));
   return res.json(results);
 });

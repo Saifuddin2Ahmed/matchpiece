@@ -1,5 +1,5 @@
 // Matchpiece PWA Service Worker
-const CACHE_NAME = 'matchpiece-1.13.3';
+const CACHE_NAME = 'matchpiece-1.13.4';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -47,12 +47,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. /api/ requests: never cached (keep as is)
-  if (request.url.includes('/api/')) {
+  const url = new URL(request.url);
+
+  // 4. /api/ requests (profile photos at /api/avatar/* included): never cached here, the browser
+  // follows the server's caching headers instead.
+  if (url.pathname.startsWith('/api/') || request.url.includes('/api/')) {
     return;
   }
-
-  const url = new URL(request.url);
 
   // 1. Page requests (navigation, "/" and "/index.html"): network first.
   // Use the cached copy only when the network fails.

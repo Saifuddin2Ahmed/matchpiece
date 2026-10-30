@@ -48,4 +48,4 @@ We actively mentor and welcome contributors from student builder communities int
 
 ## 4. Conflict Resolution
 
-Disagreements will be handled through civil, constructive dialogue in public GitHub threads. If personal or code-of-conduct conflicts arise, community members may contact the project leads confidentially at `conduct@kwegatta.org`.
+Disagreements will be handled through civil, constructive dialogue in public GitHub threads. If personal or code-of-conduct conflicts arise, community members may contact the project leads confidentially at `events@matchpiece.tech`.

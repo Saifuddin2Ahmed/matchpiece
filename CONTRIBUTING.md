@@ -8,7 +8,7 @@ Whether you are fixing a typo, designing a better empty state, improving matchma
 
 ## Code of Conduct
 
-This project is governed by the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to `conduct@kwegatta.org`.
+This project is governed by the [Contributor Covenant v2.1](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to `events@matchpiece.tech`.
 
 ---
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, Shield, Lock, Eye, Download, Trash2, Mail, ExternalLink } from 'lucide-react';
-import { BRAND_NAME, REPO_URL } from '../lib/brand';
+import { BRAND_NAME, CONTACT_EMAIL, REPO_URL } from '../lib/brand';
 
 interface PrivacyViewProps {
   onBack: () => void;
@@ -179,7 +179,10 @@ export const PrivacyView: React.FC<PrivacyViewProps> = ({ onBack }) => {
       <div className="p-6 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--card-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h3 className="font-bold text-sm text-[var(--fg)]">Have a privacy inquiry?</h3>
-          <p className="text-xs text-[var(--fg-muted)] mt-0.5">Reach out to our maintainers on GitHub or email.</p>
+          <p className="text-xs text-[var(--fg-muted)] mt-0.5">
+            Reach out to our maintainers on GitHub or email{' '}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-[var(--gold-text)] underline">{CONTACT_EMAIL}</a>.
+          </p>
         </div>
         <a
           href={`${REPO_URL}/issues`}

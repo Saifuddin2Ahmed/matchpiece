@@ -117,5 +117,5 @@ Because Matchpiece was launched as an open-source initiative for **Hacktoberfest
 ## 9. Contact Us
 
 For privacy inquiries or data removal requests:
-* Email: **`privacy@kwegatta.org`** / **`saifuddin.ai.dev@gmail.com`**
+* Email: **`events@matchpiece.tech`** / **`saifuddin.ai.dev@gmail.com`**
 

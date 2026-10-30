@@ -23,7 +23,7 @@ If you discover or suspect a security flaw in Matchpiece:
 
 1. **Email the Maintainers Privately**:
    Send an encrypted or private email to:
-   * **`security@kwegatta.org`**
+   * **`events@matchpiece.tech`**
    * Lead maintainer: **`saifuddin.ai.dev@gmail.com`**
 
 2. **Include the Following Details**:

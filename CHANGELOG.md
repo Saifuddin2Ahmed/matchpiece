@@ -4,6 +4,18 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.4] - 2026-10-30
+
+### Fixed
+- A new profile photo now shows straight away everywhere: on the profile, in People, matches, the team page, attendee lists, the header and the feed. Before, the old photo could keep showing for up to a day.
+- Photo links now include a short code that changes when the photo changes. Links with the current code are cached by the browser for a long time; links without it are checked with the server every time.
+- After saving a new photo, the app updates the photo at once without a page reload.
+- Profile link previews now always pick up a new photo.
+
+### Changed
+- The code of conduct, security policy, privacy policy, contributing guide and governance page now list events@matchpiece.tech as the contact address. The privacy page in the app shows it too.
+- Event emails can now be sent from a separate sender address (new setting EMAIL_FROM). When it is not set, emails come from the SMTP login address as before. Port 587 now uses STARTTLS; port 465 keeps using TLS.
+
 ## [1.13.3] - 2026-10-28
 
 ### Changed

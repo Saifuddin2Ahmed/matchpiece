@@ -77,6 +77,8 @@ export interface Profile {
   notify_new_events?: 'all' | 'following' | 'off';
   has_whatsapp?: boolean;
   avatar?: string;
+  /** Versioned photo URL (/api/avatar/<id>?v=<photo hash>); changes when the photo changes. */
+  avatar_url?: string;
   status?: string;
   is_demo?: boolean;
   created_at: string;

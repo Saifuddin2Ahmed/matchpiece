@@ -29,6 +29,7 @@ import { auth, handleRedirectResult, logOut } from './services/firebase';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BRAND_NAME } from './lib/brand';
 import { parseAppRoute } from './lib/route';
+import { saveCurrentProfileLocally } from './lib/currentProfile';
 
 const AdminView = React.lazy(() => import('./components/AdminView').then(m => ({ default: m.AdminView })));
 const WallView = React.lazy(() => import('./components/WallView').then(m => ({ default: m.WallView })));
@@ -734,6 +735,7 @@ export default function App() {
             onUpdateProfile={updated => {
               setCurrentProfile(updated);
               setAllProfiles(prev => prev.map(p => (p.id === updated.id ? updated : p)));
+              saveCurrentProfileLocally(updated);
             }}
             onDeleteProfile={() => {
               localStorage.removeItem('kw_me');

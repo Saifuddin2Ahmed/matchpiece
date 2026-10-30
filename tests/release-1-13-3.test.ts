@@ -112,11 +112,11 @@ describe('1.13.3 confirmation emails without attachments', () => {
     ]);
   });
 
-  it('every email has a unique Message-ID on the matchpiece.ai.studio domain', async () => {
+  it('every email has a unique Message-ID on the From domain', async () => {
     sent.length = 0;
     await sendEventConfirmationEmail(event, 'ann@example.com', 'Ann', '');
     await sendEventConfirmationEmail(event, 'ann@example.com', 'Ann', '');
-    for (const m of sent) expect(m.messageId).toMatch(/^<[0-9a-f-]{36}@matchpiece\.ai\.studio>$/);
+    for (const m of sent) expect(m.messageId).toMatch(/^<[0-9a-f-]{36}@matchpiece\.test>$/);
     expect(sent[0].messageId).not.toBe(sent[1].messageId);
   });
 

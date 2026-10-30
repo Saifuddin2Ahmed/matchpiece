@@ -287,7 +287,7 @@ describe('Team management: field visibility', () => {
     expect(r.status).toBe(200);
     const card = getPublicTeamList().find(m => m.id === id)!;
     expect(card.photo_url).toBeNull();
-    expect(card.linked_avatar).toBe('/api/avatar/t111-linked');
+    expect(card.linked_avatar).toMatch(/^\/api\/avatar\/t111-linked\?v=[0-9a-f]{10}$/);
   });
 
   it('linking to a profile that does not exist is rejected', async () => {
