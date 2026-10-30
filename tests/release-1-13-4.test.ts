@@ -176,7 +176,7 @@ describe('1.13.4 photo caching headers', () => {
 
   it('the service worker never answers /api/avatar/* from its cache', () => {
     const sw = fs.readFileSync(path.join(ROOT, 'public/sw.js'), 'utf8');
-    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.14.0';");
+    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.14.1';");
     const fetchHandler = sw.slice(sw.indexOf("addEventListener('fetch'"));
     const apiSkip = fetchHandler.indexOf("url.pathname.startsWith('/api/')");
     expect(apiSkip).toBeGreaterThan(-1);
@@ -244,7 +244,7 @@ describe('1.13.4 sender address', () => {
     expect(buildEmailFrom('', '')).toBe('');
   });
 
-  it('sent mail uses EMAIL_FROM, its domain for Message-ID, and keeps Reply-To', async () => {
+  it('sent mail uses EMAIL_FROM, its domain for Message-ID, and replies to the EMAIL_FROM address', async () => {
     process.env.EMAIL_FROM = 'events@matchpiece.tech';
     const logs: string[] = [];
     const spy = vi.spyOn(console, 'log').mockImplementation((...a: any[]) => {
@@ -260,7 +260,7 @@ describe('1.13.4 sender address', () => {
     }
     expect(sent[0].from).toBe('"Matchpiece Events" <events@matchpiece.tech>');
     expect(sent[0].messageId).toMatch(/^<[0-9a-f-]{36}@matchpiece\.tech>$/);
-    expect(sent[0].replyTo).toBe(SMTP_USER);
+    expect(sent[0].replyTo).toBe('events@matchpiece.tech');
     expect(sent[1].replyTo).toBe('host@example.com');
     expect(logs.join('\n')).not.toMatch(/@/);
   });

@@ -4,6 +4,15 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.1] - 2026-10-30
+
+### Changed
+- Event emails are now sent from events@matchpiece.tech, and replies reach the team.
+
+### Fixed
+- When an event has no contact email, replies to its emails now go to the team address instead of the sending service login, where they were lost. This applies to confirmation, waitlist promotion, registration cancelled and event cancelled emails.
+- A new optional setting, EMAIL_REPLY_TO, can set the reply address for events without a contact email.
+
 ## [1.14.0] - 2026-10-30
 
 ### Fixed

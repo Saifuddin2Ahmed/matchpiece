@@ -164,6 +164,8 @@ gcloud run deploy YOUR_SERVICE \
   --update-env-vars PUBLIC_SHARE_URL=https://your-domain.example,SMTP_USER=you@example.com
 ```
 
+Event emails are sent from `EMAIL_FROM` when it is set, otherwise from `SMTP_USER`. Replies go to the event's contact email when it has one, otherwise to the optional `EMAIL_REPLY_TO`, then to the `EMAIL_FROM` address, then to `SMTP_USER`. A Brevo SMTP login (an address ending in `smtp-brevo.com`) is never used as the reply address.
+
 Use `--update-env-vars` and `--update-secrets` so that settings already on the service are kept. To move an old address to a new one, set `LEGACY_HOSTS` and `PRIMARY_URL` on the service behind the old address (see [.env.example](.env.example)).
 
 ---

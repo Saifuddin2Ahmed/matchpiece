@@ -6542,6 +6542,30 @@ export function buildEmailFrom(smtpUser: string, emailFrom: string = process.env
   return address ? `"${EMAIL_FROM_NAME}" <${address}>` : '';
 }
 
+/** A single plain address that may be used as Reply-To (never a Brevo SMTP login). */
+export function isUsableReplyTo(address: unknown): boolean {
+  const a = String(address || '').trim();
+  return /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]+$/.test(a) && !/smtp-brevo\.com$/i.test(a);
+}
+
+/**
+ * Reply-To for event emails: the event's contact email, then EMAIL_REPLY_TO,
+ * then the EMAIL_FROM address, then the SMTP login. '' when none is usable.
+ */
+export function resolveReplyTo(
+  contactEmail: unknown,
+  smtpUser: string,
+  replyToEnv: string = process.env.EMAIL_REPLY_TO || '',
+  emailFrom: string = process.env.EMAIL_FROM || ''
+): string {
+  const fromMatch = String(emailFrom || '').match(/<([^>]+)>/);
+  const fromAddress = fromMatch ? fromMatch[1] : emailFrom;
+  for (const candidate of [contactEmail, replyToEnv, fromAddress, smtpUser]) {
+    if (isUsableReplyTo(candidate)) return String(candidate).trim();
+  }
+  return '';
+}
+
 /** Domain for Message-ID: the From address's domain, or the primary host when it has none. */
 export function messageIdDomain(from: string): string {
   const match = String(from || '').match(/@([A-Za-z0-9.-]+)>?\s*$/);
@@ -6744,10 +6768,12 @@ async function deliverEventEmail(mailOptions: any): Promise<boolean> {
   }
 
   const from = buildEmailFrom(smtpUser);
+  const { replyTo: contactEmail, ...rest } = mailOptions;
+  const replyTo = resolveReplyTo(contactEmail, smtpUser);
   const fullOptions = {
-    ...mailOptions,
+    ...rest,
     from,
-    replyTo: String(mailOptions.replyTo || '').trim() || smtpUser,
+    ...(replyTo ? { replyTo } : {}),
     messageId: `<${crypto.randomUUID()}@${messageIdDomain(from)}>`
   };
   try {
