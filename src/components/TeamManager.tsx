@@ -431,7 +431,7 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ team, detailsEnabled, 
               Show team details on the Team page
             </label>
             <p className="text-xs text-[var(--fg-muted)] mt-0.5">
-              Off: cards show only name, organisation and GitHub. On: each field marked "Show publicly" appears.
+              Off: cards show only photo, name and university. On: role, GitHub, LinkedIn and the linked profile appear (role and LinkedIn only when marked "Show publicly").
             </p>
           </div>
           <input
@@ -594,13 +594,13 @@ export const TeamManager: React.FC<TeamManagerProps> = ({ team, detailsEnabled, 
 
             <form noValidate onSubmit={save} className="space-y-3.5 text-xs">
               {textField('name', 'Full name *', { max: TEAM_LIMITS.name })}
-              {textField('title', 'Role or title', { max: TEAM_LIMITS.title, placeholder: 'e.g. Frontend Developer', show: 'show_title' })}
-              {textField('line2', 'Organisation or school', { max: TEAM_LIMITS.line2, hint: 'Always shown on the card' })}
+              {textField('title', 'Role', { max: TEAM_LIMITS.title, placeholder: 'e.g. QA & Testing Lead', show: 'show_title' })}
+              {textField('line2', 'University or organisation', { max: TEAM_LIMITS.line2, hint: 'Always shown on the card' })}
               {textField('line1', 'Background', { max: TEAM_LIMITS.line1, placeholder: 'e.g. Software Engineering student', show: 'show_line1' })}
               {textField('bio', 'Short bio', { max: TEAM_LIMITS.bio, textarea: true, show: 'show_bio' })}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {textField('github', 'GitHub username', { placeholder: 'username', hint: 'Always shown when set' })}
+                {textField('github', 'GitHub username', { placeholder: 'username', hint: 'Shown when team details are on' })}
                 {textField('linkedin', 'LinkedIn link', { type: 'url', placeholder: 'https://www.linkedin.com/in/…', show: 'show_linkedin' })}
                 {textField('x', 'X (Twitter)', { placeholder: '@handle or https://x.com/handle', show: 'show_x' })}
                 {textField('website', 'Website', { type: 'url', placeholder: 'https://…', show: 'show_website' })}

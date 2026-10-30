@@ -135,7 +135,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   // Team page state (editing lives in TeamManager)
-  const [teamDetailsEnabled, setTeamDetailsEnabled] = useState(false);
+  const [teamDetailsEnabled, setTeamDetailsEnabled] = useState(true);
 
   // Search & Filter state
   const [memberSearch, setMemberSearch] = useState('');

@@ -62,7 +62,7 @@ describe('1.13.5 audience wording', () => {
 
   it('README opens with the worldwide audience', () => {
     const intro = read('README.md').split('\n').find(l => l.startsWith('Matchpiece helps'))!;
-    expect(intro).toContain('builders, creators, professionals and students, anywhere in the world');
+    expect(intro).toContain('builders, creators, professionals, business people and students anywhere in the world');
     expect(intro).not.toMatch(/^Matchpiece helps students/);
   });
 });

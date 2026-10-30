@@ -176,7 +176,7 @@ describe('1.13.4 photo caching headers', () => {
 
   it('the service worker never answers /api/avatar/* from its cache', () => {
     const sw = fs.readFileSync(path.join(ROOT, 'public/sw.js'), 'utf8');
-    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.13.5';");
+    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.14.0';");
     const fetchHandler = sw.slice(sw.indexOf("addEventListener('fetch'"));
     const apiSkip = fetchHandler.indexOf("url.pathname.startsWith('/api/')");
     expect(apiSkip).toBeGreaterThan(-1);

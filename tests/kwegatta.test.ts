@@ -341,13 +341,13 @@ describe('Member-Submitted Events & Approval Permissions', () => {
 });
 
 describe('Service Worker & Cache-Control Configuration (PWA v1.5.2)', () => {
-  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.5 and handles cache strategies correctly', async () => {
+  it('public/sw.js specifies CACHE_NAME as matchpiece-1.14.0 and handles cache strategies correctly', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const swContent = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf-8');
 
-    // 1. Cache name includes version matchpiece-1.13.5
-    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.5'");
+    // 1. Cache name includes version matchpiece-1.14.0
+    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.14.0'");
 
     // 2. Skip waiting and clients claim are preserved
     expect(swContent).toContain('self.skipWaiting()');
@@ -6320,8 +6320,8 @@ describe('Release 1.5.0 Features', () => {
         const swCacheName = match![1];
 
         expect(swCacheName).toBe(`matchpiece-${pkg.version}`);
-        expect(pkg.version).toBe('1.13.5');
-        expect(swCacheName).toBe('matchpiece-1.13.5');
+        expect(pkg.version).toBe('1.14.0');
+        expect(swCacheName).toBe('matchpiece-1.14.0');
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {
@@ -6409,7 +6409,7 @@ describe('Release 1.5.0 Features', () => {
         );
       });
 
-      it('12) Default (global off, flags off): /api/team returns no title, line1, linkedin or since', async () => {
+      it('12) Global off, flags off: /api/team returns no title, line1, github, linkedin or since', async () => {
         const res = await fetch(`${baseUrl}/api/team`);
         expect(res.status).toBe(200);
         const list = await res.json();
@@ -6417,7 +6417,7 @@ describe('Release 1.5.0 Features', () => {
         expect(m).toBeDefined();
         expect(m.name).toBe('Visibility Test Builder');
         expect(m.line2).toBe('Makerere University');
-        expect(m.github).toBe('visbuilder');
+        expect(m.github).toBeUndefined();
         expect(m.title).toBeUndefined();
         expect(m.line1).toBeUndefined();
         expect(m.linkedin).toBeUndefined();

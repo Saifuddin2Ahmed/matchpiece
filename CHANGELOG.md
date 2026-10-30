@@ -4,6 +4,19 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-10-30
+
+### Fixed
+- The "Show team details" switch in Admin → Team works again. Before, every change failed with "Something went wrong" because the setting was saved under a name the database does not accept. The setting is now kept in its own place and is read when the server starts. When nothing has been saved yet, details are shown.
+- If the setting cannot be saved, Admin now shows a clear message and the server log records the real reason.
+- A failed write to the admin activity log no longer makes a team change fail.
+
+### Changed
+- Every team member now has the same card on the Team page and in the About team section: photo, name, role, university, and buttons for GitHub, LinkedIn and the Matchpiece profile when linked. No card is larger than another, and there is no bio line. Cards follow the order set in Admin, and empty fields are left out.
+- With team details switched on, the public team list includes role, university, GitHub, LinkedIn and the Matchpiece profile link, each still following its own "Show publicly" setting. With details off, cards show only photo, name and university.
+- In the Admin team editor the fields are now called "Role" and "University or organisation".
+- The README was rewritten: what Matchpiece is, features for members and for event organisers, the Hack Day story, the team with roles, how it works, running it locally, contributing and deployment.
+
 ## [1.13.5] - 2026-10-30
 
 ### Changed

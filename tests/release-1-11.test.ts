@@ -254,11 +254,10 @@ describe('Team management: field visibility', () => {
     id = r.json.member.id;
   });
 
-  it('with team details off, only name, organisation and GitHub are public', async () => {
+  it('with team details off, only name, photo and organisation are public', async () => {
     await api('PATCH', '/api/admin/team/settings', ADMIN, { team_details_enabled: false });
     const card = getPublicTeamList().find(m => m.id === id)!;
-    expect(card.github).toBe('vis-person');
-    for (const k of ['title', 'bio', 'linkedin', 'x', 'website', 'whatsapp_url']) expect(card[k]).toBeUndefined();
+    for (const k of ['title', 'bio', 'github', 'linkedin', 'x', 'website', 'whatsapp_url']) expect(card[k]).toBeUndefined();
   });
 
   it('with team details on, each field follows its own toggle', async () => {

@@ -1259,7 +1259,7 @@ function createInitialStore(demo: boolean = isDemoMode): StoreData {
     pinned_announcement: null,
     admin_emails: [],
     team: [...INITIAL_TEAM_MEMBERS],
-    team_details_enabled: false,
+    team_details_enabled: true,
     audit_log: [
       {
         id: 'audit-init',
@@ -1311,7 +1311,7 @@ function loadStore(): StoreData {
           parsed.team = [...INITIAL_TEAM_MEMBERS];
         }
         if (typeof parsed.team_details_enabled !== 'boolean') {
-          parsed.team_details_enabled = false;
+          parsed.team_details_enabled = true;
         }
         if (!parsed.audit_log || !Array.isArray(parsed.audit_log)) {
           parsed.audit_log = [];
@@ -1492,6 +1492,11 @@ async function batchRemoveDocs(collectionName: string, ids: string[]): Promise<v
  * has a real-time onSnapshot listener in setupFirestoreListeners(), except those in
  * WRITE_ONLY_COLLECTIONS, which are read once at boot.
  */
+// Firestore rejects ids like __name__, so the switch lives in settings/team.
+// Older builds tried to save it in the team collection; such docs are never members.
+export const TEAM_SETTINGS_COLLECTION = 'settings';
+export const TEAM_SETTINGS_DOC = 'team';
+
 export const PERSISTED_COLLECTIONS = [
   'profiles',
   'posts',
@@ -1502,6 +1507,7 @@ export const PERSISTED_COLLECTIONS = [
   'audit_log',
   'reports',
   'team',
+  'settings',
   'events',
   'event_guests',
   'event_questions',
@@ -1696,11 +1702,7 @@ export async function setupFirestoreListeners(customDbForTest?: any): Promise<vo
       snap.forEach(doc => {
         const d = doc.data();
         const docId = d.id || doc.id;
-        if (docId === '__team_settings__' || d.is_settings) {
-          store.team_details_enabled = Boolean(d.team_details_enabled);
-        } else {
-          list.push({ ...d, id: docId });
-        }
+        if (!isTeamSettingsDoc({ ...d, id: docId })) list.push({ ...d, id: docId });
       });
       if (list.length > 0) {
         store.team = list.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
@@ -1716,6 +1718,24 @@ export async function setupFirestoreListeners(customDbForTest?: any): Promise<vo
     }, (err) => {
       console.error('[Firestore] team listener error:', err?.message || err);
       if (!store.team || store.team.length === 0) store.team = [...INITIAL_TEAM_MEMBERS];
+      if (initial) { initial = false; resolve(); }
+    });
+    firestoreUnsubscribers.push(unsub);
+  }));
+
+  // 9b. Site settings listener (settings/team holds the Team details switch)
+  initialLoadPromises.push(new Promise((resolve) => {
+    let initial = true;
+    const unsub = firestoreDb!.collection('settings').onSnapshot((snap) => {
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (doc.id === TEAM_SETTINGS_DOC && typeof d?.team_details_enabled === 'boolean') {
+          store.team_details_enabled = d.team_details_enabled;
+        }
+      });
+      if (initial) { initial = false; resolve(); }
+    }, (err) => {
+      console.error('[Firestore] settings listener error:', err?.message || err);
       if (initial) { initial = false; resolve(); }
     });
     firestoreUnsubscribers.push(unsub);
@@ -9893,24 +9913,27 @@ export function getPublicTeamList(): any[] {
   list = list.filter((m: any) => !isTeamSettingsDoc(m) && !m.hidden);
   list.sort((a: any, b: any) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
-  const detailsEnabled = Boolean(store.team_details_enabled);
+  const detailsEnabled = store.team_details_enabled !== false;
 
   return list.map((m: any) => {
     const linked = linkedProfileFor(m);
+    // With details off a card shows only photo, name and university.
     const pub: Record<string, any> = {
       id: m.id,
       name: m.name,
       line2: m.line2,
-      github: m.github || null,
-      linked_profile_id: linked.profile ? m.linked_profile_id : null,
       order: Number(m.order) || 0,
       photo_url: m.photo ? teamPhotoUrl(m) : null,
-      linked_avatar: linked.avatarUrl,
-      linked_profile: linked.profile
+      linked_avatar: linked.avatarUrl
     };
 
     if (detailsEnabled) {
       const text = (v: unknown) => (v && String(v).trim() ? String(v).trim() : null);
+      if (m.github) pub.github = m.github;
+      if (linked.profile) {
+        pub.linked_profile_id = m.linked_profile_id;
+        pub.linked_profile = linked.profile;
+      }
       if (m.show_title === true && text(m.title)) pub.title = text(m.title);
       if (m.show_line1 === true && text(m.line1)) pub.line1 = text(m.line1);
       if (m.show_bio === true && text(m.bio)) pub.bio = text(m.bio);
@@ -9940,8 +9963,13 @@ async function writeAdminAudit(admin: AdminResolution, action: string, details: 
     admin: admin.adminName
   };
   store.audit_log.unshift(auditEntry);
-  await persistDoc('audit_log', auditEntry.id, auditEntry);
-  if (storageMode === 'disk') saveStore(store);
+  // The change itself is already saved; a failed audit write must not fail the request.
+  try {
+    await persistDoc('audit_log', auditEntry.id, auditEntry);
+    if (storageMode === 'disk') saveStore(store);
+  } catch (err: any) {
+    console.error(`[Audit] Failed to record ${action}:`, err?.message || err);
+  }
 }
 
 function firstError(errors: Record<string, string>): string {
@@ -10000,7 +10028,7 @@ app.get('/api/team', (_req: Request, res: Response) => {
 app.get('/api/admin/team/settings', (req: Request, res: Response) => {
   const admin = verifyAdmin(req, res);
   if (!admin) return;
-  return res.json({ team_details_enabled: Boolean(store.team_details_enabled) });
+  return res.json({ team_details_enabled: store.team_details_enabled !== false });
 });
 
 const handleUpdateTeamSettings = async (req: Request, res: Response) => {
@@ -10009,14 +10037,19 @@ const handleUpdateTeamSettings = async (req: Request, res: Response) => {
 
   const raw = req.body || {};
   const enabled = raw.team_details_enabled === true;
+  const previous = store.team_details_enabled;
   store.team_details_enabled = enabled;
 
-  await persistDoc('team', '__team_settings__', {
-    id: '__team_settings__',
-    is_settings: true,
-    team_details_enabled: enabled,
-    updated_at: new Date().toISOString()
-  });
+  try {
+    await persistDoc(TEAM_SETTINGS_COLLECTION, TEAM_SETTINGS_DOC, {
+      team_details_enabled: enabled,
+      updated_at: new Date().toISOString()
+    });
+  } catch (err: any) {
+    store.team_details_enabled = previous;
+    console.error(`[Team settings] Could not save ${TEAM_SETTINGS_COLLECTION}/${TEAM_SETTINGS_DOC}:`, err?.message || err);
+    return res.status(500).json({ error: 'The Team details setting could not be saved. Please try again in a minute.' });
+  }
 
   await writeAdminAudit(admin, 'TEAM_SETTINGS_UPDATED', `Admin set team_details_enabled to ${enabled}`);
   return res.json({ success: true, team_details_enabled: enabled });
