@@ -4,6 +4,19 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.5] - 2026-10-30
+
+### Changed
+- Matchpiece is for builders, creators, professionals and students anywhere in the world, not only for students or for one country. The About page, home page, People page, empty match and learning pages, app description, install description and README now say this.
+- The default link preview text is now "Find the people you should build and learn with: co-founders, teammates, mentors and collaborators. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source."
+- The default share image now reads "Co-founders · Teammates · Mentors · Collaborators".
+- The AI that writes profiles, finds matches and searches members no longer assumes everyone is in Kampala or Uganda.
+- The share card no longer shows "Kampala, Uganda" next to the site address. The award line stays.
+- The Contact window now shows events@matchpiece.tech instead of a personal address.
+
+### Fixed
+- The check that no old contact address is left in the code no longer fails in a fresh copy of the repository because it found its own name.
+
 ## [1.13.4] - 2026-10-30
 
 ### Fixed

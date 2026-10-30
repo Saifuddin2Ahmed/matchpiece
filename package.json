@@ -1,7 +1,7 @@
 {
   "name": "matchpiece",
-  "version": "1.13.4",
-  "description": "Network where students and builders match by what they need and offer using the open-weight Gemma 4 model.",
+  "version": "1.13.5",
+  "description": "Network where builders, creators, professionals and students anywhere in the world match by what they need and offer using the open-weight Gemma 4 model.",
   "license": "MIT",
   "repository": {
     "type": "git",

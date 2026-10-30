@@ -285,7 +285,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
         // Footer notice
         ctx.fillStyle = 'rgba(240, 243, 246, 0.4)';
         ctx.font = '13px "Inter", sans-serif';
-        ctx.fillText(`${PRIMARY_HOST} · Kampala, Uganda · 1st place · Hacktoberfest 2026 Hack Day Kampala`, 64, height - 48);
+        ctx.fillText(`${PRIMARY_HOST} · 1st place · Hacktoberfest 2026 Hack Day Kampala`, 64, height - 48);
       };
 
       drawCard(true);

@@ -20,7 +20,7 @@ import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
 import { HEADER_IMAGES } from '../lib/headerImages';
 import { TeamGrid } from './TeamGrid';
-import { BRAND_NAME, BRAND_FORMERLY, AWARD_LINE, REPO_URL } from '../lib/brand';
+import { BRAND_NAME, BRAND_FORMERLY, BRAND_AUDIENCE, AWARD_LINE, REPO_URL } from '../lib/brand';
 
 interface AboutViewProps {
   onNavigateHome: () => void;
@@ -130,7 +130,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
               Find the people you should build and learn with.
             </h1>
             <p className="max-w-2xl text-base sm:text-xl text-white/90 leading-relaxed text-balance">
-              {BRAND_NAME} matches students and builders by what they need and what they offer.
+              {BRAND_NAME} matches {BRAND_AUDIENCE} by what they need and what they offer.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
@@ -164,7 +164,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
             The right people never meet.
           </h2>
           <p className="text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed">
-            At hackathons, campuses and meetups, a developer and the founder who needs them sit two desks apart and never speak. Networking still depends on luck and on the friends you arrived with.
+            At hackathons, meetups, offices and online communities, a developer and the founder who needs them sit two desks apart and never speak. Networking still depends on luck and on the friends you arrived with.
           </p>
         </div>
         <div className="p-6 sm:p-8 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--card-border)] space-y-3">

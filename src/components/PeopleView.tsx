@@ -210,7 +210,7 @@ export const PeopleView: React.FC<PeopleViewProps> = ({
 
   return (
     <div className="kw-container space-y-6 md:space-y-10">
-      <PageHeader title="People" subtitle="Find builders, mentors and study partners." image={HEADER_IMAGES.people} />
+      <PageHeader title="People" subtitle="Find co-founders, teammates, mentors, collaborators or study partners." image={HEADER_IMAGES.people} />
 
       {/* Ask Kwegatta AI Search Panel */}
       <div className="kw-card bg-[var(--card)] border border-[var(--gold)]/30 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4">

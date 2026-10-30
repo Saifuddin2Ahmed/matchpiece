@@ -229,7 +229,7 @@ describe('In-app routes', () => {
 });
 
 describe('Default share card and meta', () => {
-  const DESCRIPTION = 'Find teammates, mentors and study partners. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.';
+  const DESCRIPTION = 'Find the people you should build and learn with: co-founders, teammates, mentors and collaborators. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.';
 
   it('default meta has no "Kwegatta" and no "matchmaking", and uses the new description', async () => {
     expect(BRAND_DESCRIPTION).toBe(DESCRIPTION);
@@ -246,7 +246,7 @@ describe('Default share card and meta', () => {
 
   it('the default share image has the new lines, large text and no pills', () => {
     const svg = buildDefaultOgSvg();
-    for (const line of ['>MATCHPIECE<', '>Find your missing piece<', '>Teammates · Mentors · Study partners<', '>1st place · Hacktoberfest Hack Day Kampala 2026<', '>matchpiece.ai.studio<']) {
+    for (const line of ['>MATCHPIECE<', '>Find your missing piece<', '>Co-founders · Teammates · Mentors · Collaborators<', '>1st place · Hacktoberfest Hack Day Kampala 2026<', '>matchpiece.ai.studio<']) {
       expect(svg).toContain(line);
     }
     expect(svg).not.toMatch(/Kwegatta|matchmaking|Open Source/i);

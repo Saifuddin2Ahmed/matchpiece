@@ -8,9 +8,11 @@ export const BRAND_TAGLINE = 'Find your missing piece';
 export const BRAND_FORMERLY = 'Kwegatta';
 /** Default description for search results and share previews. */
 export const BRAND_DESCRIPTION =
-  'Find teammates, mentors and study partners. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.';
+  'Find the people you should build and learn with: co-founders, teammates, mentors and collaborators. 1st place at Hacktoberfest Hack Day Kampala 2026. Free and open source.';
+/** Who Matchpiece is for. Not limited to students or to one country. */
+export const BRAND_AUDIENCE = 'builders, creators, professionals and students, anywhere in the world';
 /** Who you meet here; replaces "matchmaking" in share text so it is not read as a dating app. */
-export const BRAND_AUDIENCE = 'Teammates · Mentors · Study partners';
+export const BRAND_ROLES = 'Co-founders · Teammates · Mentors · Collaborators';
 export const BRAND_AWARD_SHORT = '1st place · Hacktoberfest Hack Day Kampala 2026';
 
 /** "Matchpiece: Find your missing piece" */

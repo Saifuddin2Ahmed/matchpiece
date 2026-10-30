@@ -176,7 +176,7 @@ describe('1.13.4 photo caching headers', () => {
 
   it('the service worker never answers /api/avatar/* from its cache', () => {
     const sw = fs.readFileSync(path.join(ROOT, 'public/sw.js'), 'utf8');
-    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.13.4';");
+    expect(sw).toContain("const CACHE_NAME = 'matchpiece-1.13.5';");
     const fetchHandler = sw.slice(sw.indexOf("addEventListener('fetch'"));
     const apiSkip = fetchHandler.indexOf("url.pathname.startsWith('/api/')");
     expect(apiSkip).toBeGreaterThan(-1);
@@ -216,6 +216,7 @@ describe('1.13.4 contact emails', () => {
     const hits = execSync('git ls-files', { cwd: ROOT, encoding: 'utf8' })
       .split('\n')
       .filter(f => f && !/\.(png|jpg|jpeg|webp|gif|ico|woff2?|ttf|pdf)$/i.test(f))
+      .filter(f => path.resolve(ROOT, f) !== __filename)
       .filter(f => fs.existsSync(path.join(ROOT, f)))
       .filter(f => fs.readFileSync(path.join(ROOT, f), 'utf8').includes('kwegatta' + '.org'));
     expect(hits).toEqual([]);
@@ -226,6 +227,12 @@ describe('1.13.4 contact emails', () => {
       expect(fs.readFileSync(path.join(ROOT, f), 'utf8')).toContain(CONTACT_EMAIL);
     }
     expect(fs.readFileSync(path.join(ROOT, 'src/components/PrivacyView.tsx'), 'utf8')).toContain('CONTACT_EMAIL');
+  });
+
+  it('Contact modal uses the contact address', () => {
+    const src = fs.readFileSync(path.join(ROOT, 'src/components/ContactModal.tsx'), 'utf8');
+    expect(src).toContain('const email = CONTACT_EMAIL;');
+    expect(src).not.toMatch(/@gmail\.com/);
   });
 });
 

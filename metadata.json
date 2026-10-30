@@ -1,6 +1,6 @@
 {
   "name": "Matchpiece",
-  "description": "1st place · Hacktoberfest 2026 Hack Day Kampala. Match with people you should build and learn with based on what you need and offer using the open-weight Gemma 4 model.",
+  "description": "Find the people you should build and learn with, anywhere in the world: co-founders, teammates, mentors and collaborators, matched by what you need and offer using the open-weight Gemma 4 model. 1st place · Hacktoberfest 2026 Hack Day Kampala.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

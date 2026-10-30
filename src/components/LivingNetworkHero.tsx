@@ -13,7 +13,7 @@ import { Profile } from '../types';
 import { getInitials, MIN_MEMBERS_FOR_STATS } from '../utils';
 import { useEventPhotos } from '../hooks/useEventPhotos';
 import { useTeam } from '../hooks/useTeam';
-import { BRAND_NAME, BRAND_FORMERLY, REPO_URL } from '../lib/brand';
+import { BRAND_NAME, BRAND_FORMERLY, BRAND_AUDIENCE, REPO_URL } from '../lib/brand';
 
 export interface HeroProps {
   profiles: Profile[];
@@ -132,7 +132,7 @@ export const HeroSection: React.FC<HeroProps> = ({
               Find the people you should build and learn with.
             </h1>
             <p className="text-base sm:text-lg text-[var(--fg-muted)] leading-relaxed font-normal max-w-2xl text-balance">
-              Say what you need and what you offer. In about a minute, {BRAND_NAME} matches you with people who complete you: co-founders, teammates, mentors and study partners.
+              Say what you need and what you offer. In about a minute, {BRAND_NAME} matches you with people who complete you: co-founders, teammates, mentors and collaborators. For {BRAND_AUDIENCE}.
             </p>
           </div>
 

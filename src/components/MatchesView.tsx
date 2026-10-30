@@ -289,7 +289,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
           <div className="space-y-2 max-w-md mx-auto">
             <h3 className="font-bold text-base text-[var(--fg)]">Few members yet · Pioneer cohort</h3>
             <p className="text-xs text-[var(--fg-muted)] leading-relaxed">
-              You are among the first to join {BRAND_NAME}! As classmates and builders join with their skills and project needs, Gemma 4 will automatically surface your top collaborative matches here.
+              You are among the first to join {BRAND_NAME}! As more people join with their skills and project needs, Gemma 4 will automatically surface your top collaborative matches here.
             </p>
           </div>
 
@@ -301,7 +301,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
             </div>
             <ol className="text-xs text-[var(--fg-muted)] space-y-2 pl-4 list-decimal leading-relaxed">
               <li>
-                <strong className="text-[var(--fg)]">Invite people</strong>: Share your personal link with collaborators, students, and hackathon teammates.
+                <strong className="text-[var(--fg)]">Invite people</strong>: Share your personal link with collaborators, co-workers, friends and teammates.
               </li>
               <li>
                 <strong className="text-[var(--fg)]">Instant discovery</strong>: When they complete their profile, Gemma 4 evaluates what you offer vs what they need.
@@ -355,7 +355,7 @@ export const MatchesView: React.FC<MatchesViewProps> = ({
                 )}
 
                 <p className="text-xs text-[var(--fg-muted)]">
-                  Scan this QR code or share your link to invite team members and classmates.
+                  Scan this QR code or share your link to invite teammates and collaborators.
                 </p>
 
                 <div className="flex gap-2">

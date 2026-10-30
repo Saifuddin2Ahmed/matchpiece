@@ -20,7 +20,7 @@ import { validateTeamPayload, checkPhotoDataUrl, checkX, checkWebsite, whatsappL
 import { getEffectiveStartMs, getEffectiveEndMs, getOpportunityDeadlineMs, sortForTab, findRecentDuplicate } from './src/lib/eventTiming';
 import { withHttps } from './src/lib/links';
 import { markGroup } from './src/lib/brandMark';
-import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_AUDIENCE, BRAND_AWARD_SHORT, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
+import { BRAND_NAME, BRAND_TITLE, BRAND_TAGLINE, BRAND_AUDIENCE, BRAND_ROLES, BRAND_AWARD_SHORT, EMAIL_FROM_NAME as BRAND_EMAIL_FROM_NAME, PRIMARY_HOST, PRIMARY_URL, applyBrandToHtml } from './src/lib/brand';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -2871,7 +2871,7 @@ export function buildGemmaPrompt(task: GemmaTask, data: any): string {
   switch (task) {
     case 'polish_profile': {
       const { name = '', role = '', headline = '', offers = '', needs = '', skills = [] } = data || {};
-      return `You are ${BRAND_NAME}'s profile assistant for the Kampala tech ecosystem.
+      return `You are ${BRAND_NAME}'s profile assistant. Members are ${BRAND_AUDIENCE}.
 Polish and structure this member's profile for peer learning and project collaboration.
 Raw inputs:
 - Name: ${name}
@@ -2893,7 +2893,7 @@ Return ONLY this JSON, no other text:
     case 'match': {
       const { me = {}, candidate = {}, candidates = [] } = data || {};
       if (Array.isArray(candidates) && candidates.length > 0) {
-        return `You are ${BRAND_NAME}'s matchmaking engine in Kampala (MUBS x EIIC).
+        return `You are ${BRAND_NAME}'s matchmaking engine. Members are ${BRAND_AUDIENCE}.
 Target Member (ME):
 Name: ${me.name || 'Member'}, Role: ${me.role || 'builder'}, Offers: ${me.offers || ''}, Needs: ${me.needs || ''}, Skills: ${(me.skills || []).join(', ')}
 
@@ -2911,7 +2911,7 @@ Pick top 3 best complementary partners for ME. Return ONLY a JSON array, no othe
   }
 ]`;
       }
-      return `You are ${BRAND_NAME}'s collaboration matchmaking engine in Kampala.
+      return `You are ${BRAND_NAME}'s collaboration matchmaking engine. Members are ${BRAND_AUDIENCE}.
 Analyze whether these two tech ecosystem members should connect.
 Member 1:
 Name: ${me.name || 'Member 1'}, Role: ${me.role || 'builder'}, Offers: ${me.offers || ''}, Needs: ${me.needs || ''}
@@ -2941,7 +2941,7 @@ Return ONLY a JSON array of tags:
       const candidateList = Array.isArray(candidates)
         ? candidates.slice(0, 30).map((c: any) => `ID: ${c.id}, Name: ${c.name}, Role: ${c.role}, Offers: ${c.offers}, Needs: ${c.needs}, Skills: ${(c.skills || []).join(', ')}`).join('\n')
         : '';
-      return `You are ${BRAND_NAME}'s semantic search assistant for the Kampala tech community.
+      return `You are ${BRAND_NAME}'s semantic search assistant. Members are ${BRAND_AUDIENCE}.
 Search query: "${query}"
 Evaluate community members:
 ${candidateList}
@@ -3341,7 +3341,7 @@ app.post('/api/ai/ask-kwegatta', askLimiter, async (req: Request, res: Response)
     institution: p.institution || ''
   }));
 
-  const prompt = `You are ${BRAND_NAME}'s intelligent matchmaking engine for Ugandan builders, creators, and students.
+  const prompt = `You are ${BRAND_NAME}'s intelligent matchmaking engine for ${BRAND_AUDIENCE}.
 A user asked: "${cleanQuery}".
 Based STRICTLY and ONLY on what members wrote in their profiles below, select up to 5 best matching members.
 
@@ -5094,7 +5094,7 @@ export function buildDefaultOgSvg(): string {
     ${markGroup(80, 64, 120)}
     <text x="222" y="152" fill="#F5B700" font-family="Inter, sans-serif" font-size="68" font-weight="800" letter-spacing="4">${e(BRAND_NAME.toUpperCase())}</text>
     <text x="80" y="300" fill="#FAFAFC" font-family="Inter, sans-serif" font-size="64" font-weight="800">${e(BRAND_TAGLINE)}</text>
-    <text x="80" y="372" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="40" font-weight="600">${e(BRAND_AUDIENCE)}</text>
+    <text x="80" y="372" fill="#CBD5E1" font-family="Inter, sans-serif" font-size="40" font-weight="600">${e(BRAND_ROLES)}</text>
     <text x="80" y="468" fill="#F5B700" font-family="Inter, sans-serif" font-size="34" font-weight="600">${e(BRAND_AWARD_SHORT)}</text>
     <text x="80" y="552" fill="#2DD4BF" font-family="Inter, sans-serif" font-size="36" font-weight="700">${e(PRIMARY_HOST)}</text>
   </svg>`;
@@ -7068,7 +7068,7 @@ app.get('/api/events/:id', (req: Request, res: Response) => {
 
       peopleToMeet = otherAttendees.map((c: any) => {
         let score = 75;
-        let reason = 'Shares relevant collaboration interests in the Kampala network.';
+        let reason = 'Shares relevant collaboration interests.';
 
         const skills = (c.skills || []).concat(c.tags || []);
         const matchingSkills = skills.filter((s: string) => targetNeeds.includes(String(s).toLowerCase()));

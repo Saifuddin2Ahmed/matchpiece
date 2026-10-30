@@ -341,13 +341,13 @@ describe('Member-Submitted Events & Approval Permissions', () => {
 });
 
 describe('Service Worker & Cache-Control Configuration (PWA v1.5.2)', () => {
-  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.4 and handles cache strategies correctly', async () => {
+  it('public/sw.js specifies CACHE_NAME as matchpiece-1.13.5 and handles cache strategies correctly', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const swContent = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf-8');
 
-    // 1. Cache name includes version matchpiece-1.13.4
-    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.4'");
+    // 1. Cache name includes version matchpiece-1.13.5
+    expect(swContent).toContain("CACHE_NAME = 'matchpiece-1.13.5'");
 
     // 2. Skip waiting and clients claim are preserved
     expect(swContent).toContain('self.skipWaiting()');
@@ -6320,8 +6320,8 @@ describe('Release 1.5.0 Features', () => {
         const swCacheName = match![1];
 
         expect(swCacheName).toBe(`matchpiece-${pkg.version}`);
-        expect(pkg.version).toBe('1.13.4');
-        expect(swCacheName).toBe('matchpiece-1.13.4');
+        expect(pkg.version).toBe('1.13.5');
+        expect(swCacheName).toBe('matchpiece-1.13.5');
       });
 
       it('d) OG_RENDER_VERSION busts image cache', () => {

@@ -4,7 +4,7 @@
 
 *Find your missing piece.*
 
-Matchpiece helps students and builders find teammates, mentors and study partners. You say what you need and what you offer, and Matchpiece suggests people whose offer meets your need. It also runs events with registration, tickets and check-in. It won **1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS** and is built with the open-weight **Gemma 4** model.
+Matchpiece helps builders, creators, professionals and students, anywhere in the world, find the people they should build and learn with: co-founders, teammates, mentors, collaborators or study partners. Developers, founders and business people, creators, professionals and students all use the same profile and matching. You say what you need and what you offer, and Matchpiece suggests people whose offer meets your need. It also runs events with registration, tickets and check-in. It won **1st place at Hacktoberfest 2026 Hack Day Kampala × MUBS** and is built with the open-weight **Gemma 4** model.
 
 **Live app:** https://matchpiece.ai.studio
 
@@ -49,9 +49,9 @@ Matchpiece helps students and builders find teammates, mentors and study partner
 
 ## The Problem
 
-At **Hacktoberfest Hack Day Kampala x MUBS**, business students with promising venture ideas and software engineers with technical chops sit in the exact same room and never find each other.
+At hackathons, meetups, workplaces and online communities everywhere, founders and business people with promising ideas and engineers with technical chops sit in the same room, or the same group chat, and never find each other. We saw it first at **Hacktoberfest Hack Day Kampala x MUBS**, where Matchpiece was built.
 
-The same disconnect occurs with learning: a developer eager to master Flutter or an accounting student wanting to understand database APIs often sits two desks away from someone who could teach it effortlessly.
+The same disconnect occurs with learning: a developer eager to master Flutter or an accountant wanting to understand database APIs often sits two desks away from someone who could teach it effortlessly.
 
 Traditional networking fails because:
 * People talk only to friends they arrived with.
@@ -62,10 +62,10 @@ Traditional networking fails because:
 
 ## The Solution & Goals
 
-**Matchpiece** turns room networking into a seamless experience:
+**Matchpiece** turns networking, in a room or online, into a seamless experience:
 1. **Chat Onboarding on Mobile**: A quick conversation gathers the member's name, public GitHub, what they offer, what they need, what they teach, and what they want to learn.
 2. **AI Synthesized Profiles**: The open-weight model **Gemma 4** (`gemma-4-26b-a4b-it` default, `gemma-4-31b-it` alternative) synthesizes a punchy headline, 2-sentence bio, skills, and role using strictly member-supplied facts.
-3. **Complementary Matchmaking**: AI evaluates need-and-offer coverage rather than mere surface similarity (e.g., matching a business student who needs mobile developers with a Flutter developer who needs sales and marketing).
+3. **Complementary Matchmaking**: AI evaluates need-and-offer coverage rather than mere surface similarity (e.g., matching a founder who needs mobile developers with a Flutter developer who needs sales and marketing).
 4. **Instant WhatsApp / LinkedIn Connect**: With one tap, users launch a pre-composed WhatsApp icebreaker (`wa.me`) or reach out via LinkedIn.
 5. **Peer Mentorship & Study Buddies**: Automatically identifies one mentor (who teaches what you want to learn) and one study partner (learning the same topic).
 6. **Projector Live Wall (`/wall`)**: A live wall for projectors showing real-time member registrations, AI pairings, trending skills, and a giant join QR code.

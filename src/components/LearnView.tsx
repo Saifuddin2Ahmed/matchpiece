@@ -202,7 +202,7 @@ export const LearnView: React.FC<LearnViewProps> = ({
         <div className="py-16 text-center space-y-2 border border-dashed border-[var(--card-border)] rounded-xl">
           <h3 className="font-semibold text-sm text-[var(--fg)]">No other learners in the room yet</h3>
           <p className="text-xs text-[var(--fg-muted)]">
-            As more attendees join, your complementary mentor and study partner will appear here automatically.
+            As more people join, your complementary mentor and study partner will appear here automatically.
           </p>
         </div>
       ) : (

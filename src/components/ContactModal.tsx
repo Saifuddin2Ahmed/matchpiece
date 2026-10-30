@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, Check, Copy, ExternalLink, Github, MapPin } from 'lucide-react';
 import { useDialogA11y } from '../hooks/useDialogA11y';
-import { BRAND_NAME, REPO_URL } from '../lib/brand';
+import { BRAND_NAME, CONTACT_EMAIL, REPO_URL } from '../lib/brand';
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface ContactModalProps {
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
   const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose);
-  const email = 'saifuddin.ai.dev@gmail.com';
+  const email = CONTACT_EMAIL;
 
   if (!isOpen) return null;
 
