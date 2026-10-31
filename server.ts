@@ -744,7 +744,7 @@ export const INITIAL_TEAM_MEMBERS: TeamMember[] = [
     name: 'Saifuddin Ahmed',
     title: 'Team lead and engineering',
     line1: 'Software and AI Engineer • Systems Architect',
-    line2: 'Future Stars Center for Development and Capacity Building',
+    line2: 'Al Neelain University',
     github: 'Saifuddin2Ahmed',
     linkedin: null,
     linked_profile_id: null,

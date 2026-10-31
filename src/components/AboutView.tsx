@@ -75,6 +75,171 @@ const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span className="text-xs font-semibold uppercase tracking-wider text-[var(--teal-text)]">{children}</span>
 );
 
+interface ExamplePerson {
+  name: string;
+  role: string;
+  offers: string;
+  needs: string;
+}
+
+/** Made-up people only: the About page must never show real members, team names or organisations. */
+export const EXAMPLE_MATCHES: { a: ExamplePerson; b: ExamplePerson; score: number; why: string }[] = [
+  {
+    a: { name: 'Amina', role: 'Café Owner', offers: 'Business & sales experience', needs: 'An online ordering app' },
+    b: { name: 'Daniel', role: 'Mobile Developer', offers: 'Mobile apps', needs: 'Real business and customer experience' },
+    score: 92,
+    why: 'Amina needs an ordering app that Daniel can build, and Daniel wants the real business experience Amina has.'
+  },
+  {
+    a: { name: 'Grace', role: 'Photographer', offers: 'Photos & visual content', needs: 'New clients' },
+    b: { name: 'Omar', role: 'Digital Marketer', offers: 'Marketing & ads', needs: 'Strong content for his campaigns' },
+    score: 89,
+    why: 'Grace creates the content Omar needs, and Omar brings the clients Grace is looking for.'
+  },
+  {
+    a: { name: 'Fatima', role: 'Health Researcher', offers: 'Field data & health expertise', needs: 'Data analysis' },
+    b: { name: 'Kevin', role: 'Data Analyst', offers: 'Data analysis & AI', needs: 'A real project with impact' },
+    score: 90,
+    why: 'Fatima has the data and the questions, and Kevin has the skills to turn them into answers.'
+  }
+];
+
+const EXAMPLE_ROTATE_MS = 6000;
+
+const ExamplePersonCard: React.FC<{ person: ExamplePerson; avatarClass: string }> = ({ person, avatarClass }) => (
+  <div className="md:col-span-4 p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] space-y-3 min-w-0">
+    <div className="flex items-center gap-3">
+      <div className={`w-10 h-10 rounded-full ${avatarClass} text-[#090D16] font-bold text-sm grid place-items-center shrink-0`} aria-hidden="true">
+        {person.name.charAt(0)}
+      </div>
+      <div className="min-w-0">
+        <h4 className="font-semibold text-sm text-[var(--fg)]">{person.name}</h4>
+        <p className="text-xs text-[var(--fg-muted)]">{person.role}</p>
+      </div>
+    </div>
+    <div className="space-y-1.5 text-xs">
+      <div className="text-[var(--teal-text)] font-medium">Offers: {person.offers}</div>
+      <div className="text-[var(--gold-text)] font-medium">Needs: {person.needs}</div>
+    </div>
+  </div>
+);
+
+/** Three made-up example matches. Auto-rotates gently unless the visitor hovers, focuses, picks one, or prefers reduced motion. */
+export const ExampleMatches: React.FC = () => {
+  const [index, setIndex] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+  const [userPicked, setUserPicked] = React.useState(false);
+  const [reducedMotion, setReducedMotion] = React.useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
+  const dotRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!mq) return;
+    const onChange = () => setReducedMotion(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+
+  const autoRotate = !reducedMotion && !paused && !userPicked;
+  React.useEffect(() => {
+    if (!autoRotate) return;
+    const id = window.setInterval(() => setIndex(i => (i + 1) % EXAMPLE_MATCHES.length), EXAMPLE_ROTATE_MS);
+    return () => window.clearInterval(id);
+  }, [autoRotate]);
+
+  const pick = (i: number, focus = false) => {
+    const next = (i + EXAMPLE_MATCHES.length) % EXAMPLE_MATCHES.length;
+    setUserPicked(true);
+    setIndex(next);
+    if (focus) dotRefs.current[next]?.focus();
+  };
+
+  const onDotsKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pick(index + 1, true); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pick(index - 1, true); }
+    else if (e.key === 'Home') { e.preventDefault(); pick(0, true); }
+    else if (e.key === 'End') { e.preventDefault(); pick(EXAMPLE_MATCHES.length - 1, true); }
+  };
+
+  const match = EXAMPLE_MATCHES[index];
+
+  return (
+    <div
+      className="p-5 sm:p-8 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--card-border)] space-y-5"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Example matches"
+      data-testid="example-matches"
+      data-auto-rotate={autoRotate ? 'on' : 'off'}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={e => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setPaused(false);
+      }}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[var(--fg-subtle)]">Example match</span>
+        <div className="flex items-center gap-1" role="group" aria-label="Choose an example match" onKeyDown={onDotsKeyDown}>
+          {EXAMPLE_MATCHES.map((m, i) => (
+            <button
+              key={m.a.name}
+              ref={el => { dotRefs.current[i] = el; }}
+              type="button"
+              onClick={() => pick(i)}
+              aria-label={`Example ${i + 1} of ${EXAMPLE_MATCHES.length}: ${m.a.name} and ${m.b.name}`}
+              aria-current={i === index ? 'true' : undefined}
+              tabIndex={i === index ? 0 : -1}
+              className="w-8 h-8 grid place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]"
+            >
+              <span
+                aria-hidden="true"
+                className={`block rounded-full transition-all ${
+                  i === index ? 'w-5 h-2 bg-[var(--gold)]' : 'w-2 h-2 bg-[var(--fg-subtle)]/50'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div
+        aria-live={autoRotate ? 'off' : 'polite'}
+        aria-atomic="true"
+        aria-label={`Example ${index + 1} of ${EXAMPLE_MATCHES.length}`}
+        role="group"
+        aria-roledescription="slide"
+        className="space-y-5"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4 sm:gap-6 items-center">
+          <ExamplePersonCard person={match.a} avatarClass="bg-[var(--gold)]" />
+
+          <div className="md:col-span-1 flex flex-col items-center justify-center text-center py-2 md:py-0">
+            <div className="w-10 h-10 rounded-full bg-[var(--teal-subtle)] border border-[var(--teal)]/40 text-[var(--teal-text)] grid place-items-center" aria-hidden="true">
+              <Zap className="w-4 h-4" />
+            </div>
+            <span className="text-[13px] font-mono font-semibold text-[var(--teal-text)] mt-1.5">{match.score}% Match</span>
+          </div>
+
+          <ExamplePersonCard person={match.b} avatarClass="bg-[var(--teal)]" />
+        </div>
+
+        <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-start gap-2.5 min-w-0">
+            <Sparkles className="w-4 h-4 text-[var(--gold-text)] flex-shrink-0 mt-px" aria-hidden="true" />
+            <p className="text-[var(--fg)]">
+              <strong>Why they match:</strong> {match.why}
+            </p>
+          </div>
+          <span className="text-xs font-semibold text-[var(--gold-text)] shrink-0">1-tap WhatsApp connect</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn = false }) => {
   const photos = useEventPhotos();
   const { team, loading: teamLoading } = useTeam();
@@ -249,59 +414,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigateHome, isSignedIn
           })}
         </ol>
 
-        {/* Match example */}
-        <div className="p-5 sm:p-8 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--card-border)] space-y-6" aria-label="Example match">
-          <div className="grid grid-cols-1 md:grid-cols-9 gap-4 sm:gap-6 items-center">
-            <div className="md:col-span-4 p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[var(--gold)] text-[#090D16] font-bold text-sm grid place-items-center" aria-hidden="true">
-                  SA
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm text-[var(--fg)]">Product Creator</h4>
-                  <p className="text-xs text-[var(--fg-muted)]">Future Stars Centre</p>
-                </div>
-              </div>
-              <div className="space-y-1.5 text-xs">
-                <div className="text-[var(--teal-text)] font-medium">Offers: System Architecture &amp; UI</div>
-                <div className="text-[var(--gold-text)] font-medium">Needs: Backend API &amp; Database</div>
-              </div>
-            </div>
-
-            <div className="md:col-span-1 flex flex-col items-center justify-center text-center py-2 md:py-0">
-              <div className="w-10 h-10 rounded-full bg-[var(--teal-subtle)] border border-[var(--teal)]/40 text-[var(--teal-text)] grid place-items-center" aria-hidden="true">
-                <Zap className="w-4 h-4" />
-              </div>
-              <span className="text-[13px] font-mono font-semibold text-[var(--teal-text)] mt-1.5">91% Match</span>
-            </div>
-
-            <div className="md:col-span-4 p-5 rounded-xl bg-[var(--card)] border border-[var(--card-border)] space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[var(--teal)] text-[#090D16] font-bold text-sm grid place-items-center" aria-hidden="true">
-                  AM
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm text-[var(--fg)]">Cloud Developer</h4>
-                  <p className="text-xs text-[var(--fg-muted)]">Sub-Saharan College</p>
-                </div>
-              </div>
-              <div className="space-y-1.5 text-xs">
-                <div className="text-[var(--teal-text)] font-medium">Offers: Backend API &amp; Database</div>
-                <div className="text-[var(--gold-text)] font-medium">Needs: System Architecture &amp; UI</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl bg-[var(--card)] border border-[var(--card-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="w-4 h-4 text-[var(--gold-text)] flex-shrink-0" aria-hidden="true" />
-              <span className="text-[var(--fg)]">
-                <strong>Suggested project:</strong> Build a mobile community portal together.
-              </span>
-            </div>
-            <span className="text-xs font-semibold text-[var(--gold-text)] shrink-0">1-tap WhatsApp connect</span>
-          </div>
-        </div>
+        <ExampleMatches />
       </section>
 
       {/* Recognition */}

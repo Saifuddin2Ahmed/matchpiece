@@ -4,6 +4,13 @@ All notable changes to **Matchpiece** (formerly Kwegatta) are documented in this
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.2] - 2026-10-31
+
+### Changed
+- The About page now shows three made-up example matches (Amina and Daniel, Grace and Omar, Fatima and Kevin) instead of one based on real people. Each example says why the two people match, like real matches do. Visitors can switch between them with the dots or the arrow keys. The examples change by themselves every 6 seconds, stop while the pointer or keyboard focus is on them, and do not move at all when the device asks for reduced motion.
+- The Contact window now shows Saifuddin Ahmed as Project Lead & Developer, with Hack Day Kampala × MUBS.
+- The default team list now shows Al Neelain University for Saifuddin Ahmed. Saved team data is not changed.
+
 ## [1.14.1] - 2026-10-30
 
 ### Changed

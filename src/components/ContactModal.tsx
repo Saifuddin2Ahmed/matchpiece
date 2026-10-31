@@ -60,15 +60,13 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
           </button>
         </div>
 
-        {/* Lead Engineer & Context */}
+        {/* Project lead & context */}
         <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--card-border)] space-y-2 text-xs">
-          <div className="flex items-center justify-between font-semibold text-[var(--fg)]">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 font-semibold text-[var(--fg)]">
             <span>Saifuddin Ahmed</span>
-            <span className="text-[var(--gold-text)] font-mono text-[13px]">Team Lead</span>
+            <span className="text-[var(--gold-text)] font-mono text-[13px]">Project Lead &amp; Developer</span>
           </div>
-          <p className="text-[var(--fg-muted)] leading-relaxed">
-            Future Stars Center for Development &amp; Capacity Building · Hack Day Kampala × MUBS
-          </p>
+          <p className="text-[var(--fg-muted)] leading-relaxed">Hack Day Kampala × MUBS</p>
           <div className="flex items-center gap-1.5 text-[var(--fg-subtle)] text-[13px] pt-1 border-t border-[var(--card-border)]/50">
             <MapPin className="w-3 h-3 text-[var(--teal-text)] flex-shrink-0" />
             <span>Makerere University Business School (MUBS), Kampala, Uganda</span>
